@@ -135,6 +135,7 @@
 
     // Fisher-Yates Complete Random Mixing Filter Configuration
         // Enhanced filtration, shuffling, and explicit screen score tracking reset
+       // Enhanced filtration, shuffling, and explicit scoreboard screen clearing
     function generateCustomQuiz() {
         const checkboxes = document.querySelectorAll('.filter-grid input[type="checkbox"]');
         let selectedTags = [];
@@ -150,6 +151,29 @@
             const topicText = q.topic || q.t || "";
             return selectedTags.some(tag => topicText === tag);
         });
+
+        // Fisher-Yates Complete Random Mixing Filter Configuration
+        for (let i = filteredQuestions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [filteredQuestions[i], filteredQuestions[j]] = [filteredQuestions[j], filteredQuestions[i]];
+        }
+
+        // Force reset the background tracking parameters
+        active = filteredQuestions.slice(0, Math.min(10, filteredQuestions.length));
+        idx = 0; 
+        score = 0; 
+        mistakes = [];
+        
+        // CRUCIAL RESET: Erase the previous scoreboard data entirely right now
+        // This ensures the old text vanishes completely when starting your next attempt
+        document.getElementById('s-text').innerText = "";
+        document.getElementById('eval-text').innerText = "";
+
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
+        loadQ();
+    }
+
 
         // Fisher-Yates Complete Random Mixing Filter Configuration
         for (let i = filteredQuestions.length - 1; i > 0; i--) {
