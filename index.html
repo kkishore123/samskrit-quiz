@@ -119,7 +119,7 @@
         }
     }
 
-    // Activated only when clicking the 'Start Quiz' button
+    // Bulletproof filtration engine separating nouns and pronouns completely
     function generateCustomQuiz() {
         const checkboxes = document.querySelectorAll('.filter-grid input[type="checkbox"]');
         let selectedValues = [];
@@ -131,13 +131,30 @@
         }
         document.getElementById('error-msg').style.display = 'none';
 
-        // Filter the question deck securely based on selections
+        // Filter the question deck strictly using explicit tag limits
         filteredQuestions = masterQuestions.filter(q => {
             const topicText = q.topic || q.t || "";
-            return selectedValues.some(val => topicText.includes(val));
+            
+            return selectedValues.some(val => {
+                // Strict isolation for Pronouns
+                if (val === "तद्") return topicText.includes("तच्छब्दः");
+                if (val === "एतद्") return topicText.includes("एतच्छब्दः");
+                if (val === "किम्") return topicText.includes("किम्शब्दः");
+                
+                // Strict isolation for Nouns (Prevents partial overlaps)
+                if (val === "राम") return topicText.includes("रामशब्दः");
+                if (val === "देव") return topicText.includes("देवशब्दः");
+                if (val === "नदी") return topicText.includes("नदीशब्दः");
+                if (val === "लता") return topicText.includes("लताशब्दः");
+                if (val === "माला") return topicText.includes("मालाशब्दः");
+                if (val === "वन") return topicText.includes("वनशब्दः");
+                if (val === "फल") return topicText.includes("फलशब्दः");
+                
+                return false;
+            });
         });
 
-        // Pull exactly 10 questions at random from the filtered pool
+        // Pull exactly 10 questions at random from the strictly filtered pool
         active = [...filteredQuestions].sort(() => 0.5 - Math.random()).slice(0, Math.min(10, filteredQuestions.length));
         idx = 0; score = 0; mistakes = [];
         
@@ -161,31 +178,6 @@
             li.onclick = () => select(li, opt); box.appendChild(li);
         });
     }
-
-        // Strict filtration engine checking exact topic names to match user selection
-    function applyFilters() {
-        const checkboxes = document.querySelectorAll('.filter-grid input[type="checkbox"]');
-        let selectedValues = [];
-        checkboxes.forEach(cb => { if (cb.checked) selectedValues.push(cb.value); });
-
-        filteredQuestions = masterQuestions.filter(q => {
-            const topicText = q.topic || q.t || "";
-            
-            // This forces the program to strictly separate the categories
-            return selectedValues.some(val => {
-                if (val === "तद्") return topicText.includes("तच्छब्दः");
-                if (val === "एतद्") return topicText.includes("एतच्छब्दः");
-                if (val === "किम्") return topicText.includes("किम्शब्दः");
-                return topicText.includes(val + "शब्दः");
-            });
-        });
-
-        startRound();
-    }
-
-
-
-    
 
     function select(el, opt) {
         const items = document.querySelectorAll('.item'); const f = document.getElementById('f-box'); const q = active[idx];
