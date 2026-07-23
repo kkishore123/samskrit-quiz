@@ -33,7 +33,6 @@
         .btn:hover { background: var(--hover); }
         .btn-hint { background: none; border: 1px solid #cbd5e1; color: #475569; padding: 6px 14px; border-radius: 6px; cursor: pointer; display: inline-block; margin-bottom: 10px; }
         
-        /* Cancel Button Style Styling Framework */
         .btn-break { background: #e74c3c !important; color: white !important; margin-right: auto; }
         .btn-break:hover { background: #c0392b !important; }
         
@@ -89,7 +88,6 @@
         <div class="box" id="h-box"></div>
         <div class="fb" id="f-box"></div>
         <div class="actions">
-            <!-- Break Cancel Navigation Switch Button Injection Component -->
             <button class="btn btn-break" onclick="backToSetup()">विरामः (Break)</button>
             <button class="btn" id="n-btn" style="display:none;" onclick="nextQ()">अग्रिमप्रश्नः</button>
         </div>
@@ -133,9 +131,6 @@
         }
     }
 
-    // Fisher-Yates Complete Random Mixing Filter Configuration
-        // Enhanced filtration, shuffling, and explicit screen score tracking reset
-       // Enhanced filtration, shuffling, and explicit scoreboard screen clearing
     function generateCustomQuiz() {
         const checkboxes = document.querySelectorAll('.filter-grid input[type="checkbox"]');
         let selectedTags = [];
@@ -152,51 +147,6 @@
             return selectedTags.some(tag => topicText === tag);
         });
 
-        // Fisher-Yates Complete Random Mixing Filter Configuration
-        for (let i = filteredQuestions.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [filteredQuestions[i], filteredQuestions[j]] = [filteredQuestions[j], filteredQuestions[i]];
-        }
-
-        // Force reset the background tracking parameters
-        active = filteredQuestions.slice(0, Math.min(10, filteredQuestions.length));
-        idx = 0; 
-        score = 0; 
-        mistakes = [];
-        
-        // CRUCIAL RESET: Erase the previous scoreboard data entirely right now
-        // This ensures the old text vanishes completely when starting your next attempt
-        document.getElementById('s-text').innerText = "";
-        document.getElementById('eval-text').innerText = "";
-
-        document.getElementById('setup-screen').style.display = 'none';
-        document.getElementById('quiz-screen').style.display = 'block';
-        loadQ();
-    }
-
-
-        // Fisher-Yates Complete Random Mixing Filter Configuration
-        for (let i = filteredQuestions.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [filteredQuestions[i], filteredQuestions[j]] = [filteredQuestions[j], filteredQuestions[i]];
-        }
-
-        // Force reset the background tracking parameters
-        active = filteredQuestions.slice(0, Math.min(10, filteredQuestions.length));
-        idx = 0; 
-        score = 0; 
-        mistakes = [];
-        
-        // CRUCIAL: Instantly overwrite the old scoreboard text back to zero right now
-        document.getElementById('s-text').innerText = "0 / 10";
-
-        document.getElementById('setup-screen').style.display = 'none';
-        document.getElementById('quiz-screen').style.display = 'block';
-        loadQ();
-    }
-
-
-        // Thoroughly shuffle the full question bank deck before taking the top 10
         for (let i = filteredQuestions.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [filteredQuestions[i], filteredQuestions[j]] = [filteredQuestions[j], filteredQuestions[i]];
@@ -205,6 +155,12 @@
         active = filteredQuestions.slice(0, Math.min(10, filteredQuestions.length));
         idx = 0; score = 0; mistakes = [];
         
+        // Dynamic visibility layers configuration fix
+        document.getElementById('res-screen').style.display = 'none'; // Force hide old results screen layer
+        document.getElementById('rev-screen').style.display = 'none'; // Force hide revision layer
+        document.getElementById('s-text').innerText = "";             // Clean out previous score strings
+        document.getElementById('eval-text').innerText = "";
+
         document.getElementById('setup-screen').style.display = 'none';
         document.getElementById('quiz-screen').style.display = 'block';
         loadQ();
@@ -248,22 +204,12 @@
     }
 
     function nextQ() { idx++; if (idx < active.length) loadQ(); else showResults(); }
-       // Explicitly recalculates and prints the fresh score upon quiz completion
     function showResults() {
-        document.getElementById('quiz-screen').style.display = 'none'; 
-        document.getElementById('res-screen').style.display = 'block';
-        
-        // Calculate your accurate score for THIS round on the spot
-        const totalQuestions = active.length;
-        
-        // Force rewrite the HTML text immediately to prevent any caching bugs
-        document.getElementById('s-text').innerText = `${score} / ${totalQuestions}`;
-        
-        // Overwrite the feedback evaluation text dynamically
-        const pct = totalQuestions > 0 ? (score / totalQuestions) * 100 : 0;
+        document.getElementById('quiz-screen').style.display = 'none'; document.getElementById('res-screen').style.display = 'block';
+        document.getElementById('s-text').innerText = `${score} / ${active.length}`;
+        const pct = (score / active.length) * 100;
         document.getElementById('eval-text').innerText = pct === 100 ? "अतिउत्तमम्! सर्वं शुद्धम्!" : pct >= 70 ? "उत्तमं प्रयासम्!" : "पुनः अभ्यासं करोतु।";
     }
-
     function showReview() {
         document.getElementById('res-screen').style.display = 'none'; const container = document.getElementById('rev-list'); container.innerHTML = '';
         if (mistakes.length === 0) container.innerHTML = '<div class="card clear">✨ भवतः/भवत्याः कापि त्रुटिः नास्ति! सर्वं शुद्धम्!</div>';
@@ -277,20 +223,13 @@
         document.getElementById('rev-screen').style.display = 'block';
     }
     function hideReview() { document.getElementById('rev-screen').style.display = 'none'; document.getElementById('res-screen').style.display = 'block'; }
-        // Safety exit function that flushes game data and resets counters back to zero
     function backToSetup() { 
-        // 1. Flush memory caches to stop score freezing bugs
-        idx = 0; 
-        score = 0; 
-        mistakes = []; 
-        active = [];
-
-        // 2. Safely swap visibility layers back to the selection screen
+        idx = 0; score = 0; mistakes = []; active = [];
         document.getElementById('quiz-screen').style.display = 'none'; 
         document.getElementById('res-screen').style.display = 'none'; 
+        document.getElementById('rev-screen').style.display = 'none'; 
         document.getElementById('setup-screen').style.display = 'block'; 
     }
-
     window.addEventListener('DOMContentLoaded', initQuiz);
 </script>
 </body>
