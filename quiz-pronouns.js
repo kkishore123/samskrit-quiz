@@ -1,4 +1,4 @@
-const pronounQuestions = [
+window.pronounQuestions = [
   {
     "topic": "सर्वनाम-तच्छब्दः (पुंलिङ्गः - सः)",
     "questionText": "तद् (पुंलिङ्ग) शब्दस्य प्रथमाविभक्तेः बहुवचनरूपं किम्?",
