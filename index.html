@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samskritam Vibhakti Quiz</title>
+    <script src="https://tailwindcss.com"></script>
+</head>
+<body class="bg-amber-50 text-slate-800 font-sans p-6">
+    <div class="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow-md border border-amber-200">
+        <h1 class="text-2xl font-bold text-center text-amber-800 mb-4">Samskritam Vibhakti Quiz</h1>
+        
+        <div id="quiz-container">
+            <div class="flex justify-between items-center mb-4 bg-amber-100 p-3 rounded-lg">
+                <span id="word-info" class="font-semibold text-lg">Word: -</span>
+                <button onclick="playAudio()" class="bg-amber-600 text-white px-3 py-1.5 rounded-md text-sm hover:bg-amber-700">🔊 Listen</button>
+            </div>
+            
+            <p id="question-text" class="text-lg font-medium mb-4">Identify the Vibhakti and Vachanam:</p>
+            
+            <div id="options-container" class="grid gap-3 mb-4"></div>
+            
+            <div id="feedback" class="hidden p-3 rounded-lg mb-4 text-center font-medium"></div>
+            
+            <button id="next-btn" onclick="nextQuestion()" class="hidden w-full bg-emerald-600 text-white py-2 rounded-lg font-semibold hover:bg-emerald-700">Next Question</button>
+        </div>
+        
+        <div id="score-container" class="hidden text-center">
+            <h2 class="text-xl font-bold mb-2">Quiz Finished!</h2>
+            <p id="final-score" class="text-lg mb-4"></p>
+            <button onclick="restartQuiz()" class="bg-amber-600 text-white px-4 py-2 rounded-lg font-semibold">Restart</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            { word: "रामः", vibhakti: "Prathama Vibhakti, Ekavachanam", options: ["Prathama Vibhakti, Ekavachanam", "Dvitiya Vibhakti, Ekavachanam", "Tritiya Vibhakti, Bahuvachanam"] },
+            { word: "रामाय", vibhakti: "Chaturthi Vibhakti, Ekavachanam", options: ["Prathama Vibhakti, Ekavachanam", "Chaturthi Vibhakti, Ekavachanam", "Shashthi Vibhakti, Dvivachanam"] },
+            { word: "तेन", vibhakti: "Tritiya Vibhakti, Ekavachanam", options: ["Panchami Vibhakti, Ekavachanam", "Tritiya Vibhakti, Ekavachanam", "Saptami Vibhakti, Bahuvachanam"] }
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+
+        function loadQuestion() {
+            const q = quizData[currentIdx];
+            document.getElementById("word-info").innerText = `Padam: ${q.word}`;
+            document.getElementById("question-text").innerText = `What is the correct form for "${q.word}"?`;
+            
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+            const container = document.getElementById("options-container");
+            container.innerHTML = "";
+            
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.innerText = opt;
+                btn.className = "w-full text-left p-3 rounded-lg border border-slate-200 hover:bg-amber-50 font-medium transition";
+                btn.onclick = () => selectAnswer(opt, q.vibhakti, btn);
+                container.appendChild(btn);
+            });
+
+            document.getElementById("feedback").classList.add("hidden");
+            document.getElementById("next-btn").classList.add("hidden");
+        }
+
+        function selectAnswer(selected, correct, button) {
+            const feedback = document.getElementById("feedback");
+            feedback.classList.remove("hidden");
+            
+            const buttons = document.querySelectorAll("#options-container button");
+            buttons.forEach(b => b.disabled = true);
+
+            if (selected === correct) {
+                score++;
+                button.classList.add("bg-emerald-100", "border-emerald-500", "text-emerald-800");
+                feedback.innerText = "Correct! साधu (Sadhu)!";
+                feedback.className = "p-3 rounded-lg mb-4 text-center font-medium bg-emerald-100 text-emerald-800";
+            } else {
+                button.classList.add("bg-rose-100", "border-rose-500", "text-rose-800");
+                feedback.innerText = `Incorrect. Correct answer is: ${correct}`;
+                feedback.className = "p-3 rounded-lg mb-4 text-center font-medium bg-rose-100 text-rose-800";
+            }
+            document.getElementById("next-btn").classList.remove("hidden");
+        }
+
+        function nextQuestion() {
+            currentIdx++;
+            if (currentIdx < quizData.length) {
+                loadQuestion();
+            } else {
+                document.getElementById("quiz-container").classList.add("hidden");
+                document.getElementById("score-container").classList.remove("hidden");
+                document.getElementById("final-score").innerText = `You scored ${score} out of ${quizData.length}`;
+            }
+        }
+
+        function playAudio() {
+            const text = quizData[currentIdx].word;
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'sa-IN'; // Sanskrit fallback to hi-IN if unsupported
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function restartQuiz() {
+            currentIdx = 0;
+            score = 0;
+            document.getElementById("quiz-container").classList.remove("hidden");
+            document.getElementById("score-container").classList.add("hidden");
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
