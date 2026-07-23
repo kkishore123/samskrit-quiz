@@ -3,43 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>संस्कृत-व्याकरण-प्रश्नोत्तरी</title>
+    <title>संस्कृत-प्रश्नोत्तरी</title>
     <style>
         :root {
-            --primary: #8e44ad; --primary-hover: #732d91;
-            --bg: #f8f9fa; --card-bg: #ffffff; --text: #2c3e50;
-            --success: #27ae60; --danger: #c0392b;
-            --hint-bg: #eef2f7; --hint-text: #475569;
+            --primary: #8e44ad; --hover: #732d91; --bg: #f8f9fa; --card: #ffffff;
+            --text: #2c3e50; --success: #27ae60; --danger: #c0392b; --hint: #eef2f7;
         }
-        body {
-            font-family: 'Segoe UI', sans-serif; background: var(--bg);
-            color: var(--text); margin: 0; padding: 20px;
-            display: flex; justify-content: center;
-        }
-        .quiz-container {
-            max-width: 650px; width: 100%; background: var(--card-bg);
-            padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+        .quiz-container { max-width: 600px; width: 100%; background: var(--card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: var(--primary); margin-top: 0; }
         .progress { font-size: 0.9rem; color: #7f8c8d; text-align: right; margin-bottom: 10px; }
-        .topic-tag { display: inline-block; background: #f1f2f6; color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 15px; }
-        .question { font-size: 1.3rem; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
-        .options-list { list-style: none; padding: 0; margin-bottom: 20px; }
-        .option-item { background: var(--bg); border: 2px solid #e2e8f0; padding: 14px 20px; margin-bottom: 12px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; transition: all 0.2s; }
-        .option-item:hover { border-color: var(--primary); background: #fbf7fc; }
-        .option-item.correct { background: #d4edda; border-color: var(--success); color: #155724; }
-        .option-item.incorrect { background: #f8d7da; border-color: var(--danger); color: #721c24; }
-        .option-item.disabled { pointer-events: none; }
-        .hint-btn { background: none; border: 1px solid #cbd5e1; color: var(--hint-text); padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-        .hint-box { display: none; background: var(--hint-bg); color: var(--hint-text); padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid var(--primary); }
-        .feedback-box { margin-top: 20px; padding: 15px; border-radius: 8px; font-weight: 500; display: none; }
-        .feedback-box.correct { display: block; background: #d4edda; color: #155724; }
-        .feedback-box.incorrect { display: block; background: #f8d7da; color: #721c24; }
-        .action-container { display: flex; justify-content: space-between; margin-top: 25px; padding-top: 20px; border-top: 2px solid var(--bg); }
-        .next-btn, .restart-btn { background: var(--primary); color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; }
-        .next-btn:hover, .restart-btn:hover { background: var(--primary-hover); }
-        .result-screen { text-align: center; display: none; }
-        .result-score { font-size: 3rem; font-weight: bold; color: var(--primary); margin: 20px 0; }
+        .tag { display: inline-block; background: #f1f2f6; color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 15px; }
+        .question { font-size: 1.25rem; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
+        .options { list-style: none; padding: 0; margin-bottom: 20px; }
+        .item { background: var(--bg); border: 2px solid #e2e8f0; padding: 12px 18px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .item:hover { border-color: var(--primary); background: #fbf7fc; }
+        .item.correct { background: #d4edda; border-color: var(--success); color: #155724; }
+        .item.incorrect { background: #f8d7da; border-color: var(--danger); color: #721c24; }
+        .item.disabled { pointer-events: none; }
+        .btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn:hover { background: var(--hover); }
+        .btn-hint { background: none; border: 1px solid #cbd5e1; color: #475569; padding: 6px 14px; border-radius: 6px; cursor: pointer; }
+        .box { display: none; background: var(--hint); padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid var(--primary); }
+        .fb { margin-top: 15px; padding: 12px; border-radius: 8px; font-weight: 500; display: none; }
+        .fb.correct { display: block; background: #d4edda; color: #155724; }
+        .fb.incorrect { display: block; background: #f8d7da; color: #721c24; }
+        .actions { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--bg); }
+        .screen { display: none; text-align: center; }
+        .score { font-size: 3rem; font-weight: bold; color: var(--primary); margin: 15px 0; }
+        .group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .card { background: #fff; border: 1px solid #e2e8f0; border-left: 5px solid var(--danger); text-align: left; padding: 12px; margin-bottom: 10px; border-radius: 6px; }
+        .card.clear { border-left-color: var(--success); text-align: center; font-size: 1.1rem; background: #f4fbf7; }
     </style>
 </head>
 <body>
@@ -47,105 +41,138 @@
 <div class="quiz-container">
     <div id="quiz-screen">
         <h1 id="quiz-title">संस्कृत-व्याकरण-प्रश्नोत्तरी</h1>
-        <div class="progress" id="progress-text">प्रश्न संख्या: 1 / 10</div>
-        <div class="topic-tag" id="topic-text">विषयः</div>
-        <div class="question" id="question-text">प्रश्नः</div>
-        <ul class="options-list" id="options-container"></ul>
-        <button class="hint-btn" onclick="toggleHint()">सङ्केतः (Hint)</button>
-        <div class="hint-box" id="hint-container"></div>
-        <div class="feedback-box" id="feedback-container"></div>
-        <div class="action-container">
-            <div></div>
-            <button class="next-btn" id="next-button" style="display:none;" onclick="nextQuestion()">अग्रिमप्रश्नः (Next)</button>
+        <div class="progress" id="p-text">प्रश्न संख्या: 1 / 10</div>
+        <div class="tag" id="t-text">विषयः</div>
+        <div class="question" id="q-text">प्रश्नः</div>
+        <ul class="options" id="o-box"></ul>
+        <button class="btn-hint" onclick="toggleHint()">सङ्केतः (Hint)</button>
+        <div class="box" id="h-box"></div>
+        <div class="fb" id="f-box"></div>
+        <div class="actions"><div></div><button class="btn" id="n-btn" style="display:none;" onclick="nextQ()">अग्रिमप्रश्नः</button></div>
+    </div>
+
+    <div class="screen" id="res-screen">
+        <h1>प्रश्नोत्तरी समाप्ता</h1>
+        <p>भवतः/भवत्याः अङ्काः (Your Score):</p>
+        <div class="score" id="s-text">0 / 10</div>
+        <p id="eval-text">उत्तमं प्रयासम्!</p>
+        <div class="group">
+            <button class="btn" onclick="showReview()">त्रुटीन् पश्यन्तु (Revise Mistakes)</button>
+            <button class="btn" onclick="startRound()">नूतन-पर्यायः आरभ्यताम् (One More Round)</button>
         </div>
     </div>
 
-    <div class="result-screen" id="result-screen">
-        <h1>प्रश्नोत्तरी समाप्ता</h1>
-        <p>भवतः/भवत्याः अङ्काः (Your Score):</p>
-        <div class="result-score" id="score-text">0 / 10</div>
-        <p id="result-evaluation">उत्तमं प्रयासम्!</p>
-        <button class="restart-btn" onclick="restartQuiz()">पुनः आरम्भः करोतु (Restart)</button>
+    <div class="screen" id="rev-screen">
+        <h1>त्रुटि-संशोधनम् (Revision)</h1>
+        <div id="rev-list"></div>
+        <div class="group"><button class="btn" onclick="hideReview()">परिणाम-फलकम् प्रति गच्छतु</button></div>
     </div>
 </div>
 
-<script src="quiz-data.js"></script>
 <script>
-    let currentQuestionIndex = 0, score = 0;
+    let db = [], active = [], idx = 0, score = 0, mistakes = [];
 
-    function initQuiz() {
-        if (typeof quizData !== 'undefined' && quizData.quizTitle) {
-            document.getElementById('quiz-title').innerText = quizData.quizTitle;
-            loadQuestion();
-        } else {
-            document.getElementById('question-text').innerText = "त्रुटिः: 'quiz-data.js' न मिलितम्। (Error: quiz-data.js missing)";
+    async function initQuiz() {
+        try {
+            document.getElementById('q-text').innerText = "प्रश्नाः लोड हुँदैछन्... (Loading Questions...)";
+            // Pulling data stream over cloud to avoid layout window spill limits
+            const res = await fetch('https://jsonsilo.com');
+            db = await res.json();
+            startRound();
+        } catch (err) {
+            document.getElementById('q-text').innerText = "त्रुटिः: डेटा लोड कर्तुं न शक्यते। कृपया अन्तर्जालं पश्यन्तु। (Error fetching cloud repository data)";
         }
     }
 
-    function loadQuestion() {
-        const q = quizData.questions[currentQuestionIndex];
-        document.getElementById('progress-text').innerText = `प्रश्न संख्या: ${currentQuestionIndex + 1} / ${quizData.questions.length}`;
-        document.getElementById('topic-text').innerText = q.topic;
-        document.getElementById('question-text').innerText = q.questionText;
-        document.getElementById('hint-container').style.display = 'none';
+    function startRound() {
+        document.getElementById('res-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
+        active = [...db].sort(() => 0.5 - Math.random()).slice(0, 10);
+        idx = 0; score = 0; mistakes = [];
+        loadQ();
+    }
+
+    function loadQ() {
+        const q = active[idx];
+        document.getElementById('p-text').innerText = `प्रश्न संख्या: ${idx + 1} / 10`;
+        document.getElementById('t-text').innerText = q.t;
+        document.getElementById('q-text').innerText = q.q;
+        document.getElementById('h-box').style.display = 'none';
         
-        const fb = document.getElementById('feedback-container');
-        fb.className = 'feedback-box'; fb.style.display = 'none';
-        document.getElementById('next-button').style.display = 'none';
+        const f = document.getElementById('f-box');
+        f.className = 'fb'; f.style.display = 'none';
+        document.getElementById('n-btn').style.display = 'none';
 
-        const container = document.getElementById('options-container');
-        container.innerHTML = '';
+        const box = document.getElementById('o-box');
+        box.innerHTML = '';
 
-        q.options.forEach((opt) => {
+        q.o.forEach((opt) => {
             const li = document.createElement('li');
-            li.className = 'option-item'; li.innerText = opt.text;
-            li.onclick = () => selectOption(li, opt);
-            container.appendChild(li);
+            li.className = 'item'; li.innerText = opt.t;
+            li.onclick = () => select(li, opt);
+            box.appendChild(li);
         });
     }
 
-    function selectOption(el, opt) {
-        const items = document.querySelectorAll('.option-item');
-        const fb = document.getElementById('feedback-container');
-        items.forEach(item => item.classList.add('disabled'));
+    function select(el, opt) {
+        const items = document.querySelectorAll('.item');
+        const f = document.getElementById('f-box');
+        const q = active[idx];
+        items.forEach(i => i.classList.add('disabled'));
 
-        if (opt.isCorrect) {
-            el.classList.add('correct'); fb.innerText = opt.reason;
-            fb.className = 'feedback-box correct'; score++;
+        if (opt.c) {
+            el.classList.add('correct'); f.innerText = opt.r;
+            f.className = 'fb correct'; score++;
         } else {
-            el.classList.add('incorrect'); fb.innerText = opt.reason;
-            fb.className = 'feedback-box incorrect';
-            items.forEach((item, idx) => {
-                if (quizData.questions[currentQuestionIndex].options[idx].isCorrect) item.classList.add('correct');
-            });
+            el.classList.add('incorrect'); f.innerText = opt.r;
+            f.className = 'fb incorrect';
+            items.forEach((item, i) => { if (q.o[i].c) item.classList.add('correct'); });
+            const correctOpt = q.o.find(o => o.c);
+            mistakes.push({ t: q.t, q: q.q, chosen: opt.t, correct: correctOpt.t, r: opt.r });
         }
-        document.getElementById('next-button').style.display = 'block';
+        document.getElementById('n-btn').style.display = 'block';
     }
 
     function toggleHint() {
-        const box = document.getElementById('hint-container');
-        box.innerText = quizData.questions[currentQuestionIndex].hint;
+        const box = document.getElementById('h-box');
+        box.innerText = active[idx].h;
         box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
     }
 
-    function nextQuestion() {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < quizData.questions.length) loadQuestion(); else showResults();
+    function nextQ() {
+        idx++;
+        if (idx < 10) loadQ(); else showResults();
     }
 
     function showResults() {
         document.getElementById('quiz-screen').style.display = 'none';
-        document.getElementById('result-screen').style.display = 'block';
-        document.getElementById('score-text').innerText = `${score} / ${quizData.questions.length}`;
-        const pct = (score / quizData.questions.length) * 100;
-        document.getElementById('result-evaluation').innerText = pct === 100 ? "अतिउत्तमम्! सर्वं शुद्धम्!" : pct >= 70 ? "उत्तमं प्रयासम्!" : "पुनः अभ्यासं करोतु।";
+        document.getElementById('res-screen').style.display = 'block';
+        document.getElementById('s-text').innerText = `${score} / 10`;
+        const pct = (score / 10) * 100;
+        document.getElementById('eval-text').innerText = pct === 100 ? "अतिउत्तमम्! सर्वं शुद्धम्!" : pct >= 70 ? "उत्तमं प्रयासम्!" : "पुनः अभ्यासं करोतु।";
     }
 
-    function restartQuiz() {
-        currentQuestionIndex = 0; score = 0;
-        document.getElementById('result-screen').style.display = 'none';
-        document.getElementById('quiz-screen').style.display = 'block';
-        loadQuestion();
+    function showReview() {
+        document.getElementById('res-screen').style.display = 'none';
+        const container = document.getElementById('rev-list');
+        container.innerHTML = '';
+        
+        if (mistakes.length === 0) {
+            container.innerHTML = '<div class="card clear">✨ भवतः/भवत्याः कापि त्रुटिः नास्ति! सर्वं शुद्धम्!</div>';
+        } else {
+            mistakes.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `<strong>विषयः:</strong> ${m.t}<br><strong>प्रश्नः:</strong> ${m.q}<br><span style="color:var(--danger)"><strong>भवतः उत्तरम्:</strong> ${m.chosen}</span><br><span style="color:var(--success)"><strong>शुद्धम् उत्तरम्:</strong> ${m.correct}</span><br><small style="color:#7f8c8d"><strong>विवरणम्:</strong> ${m.r}</small>`;
+                container.appendChild(div);
+            });
+        }
+        document.getElementById('rev-screen').style.display = 'block';
+    }
+
+    function hideReview() {
+        document.getElementById('rev-screen').style.display = 'none';
+        document.getElementById('res-screen').style.display = 'block';
     }
 
     window.addEventListener('DOMContentLoaded', initQuiz);
