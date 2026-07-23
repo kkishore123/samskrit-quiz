@@ -54,16 +54,16 @@
     <div class="setup-section" id="setup-screen">
         <div class="setup-title">अभ्यासार्थं शब्दान् चिन्वन्तु (Choose Words to Practice):</div>
         <div class="filter-grid">
-            <label class="filter-item"><input type="checkbox" value="राम" checked> रामः</label>
-            <label class="filter-item"><input type="checkbox" value="देव" checked> देवः</label>
-            <label class="filter-item"><input type="checkbox" value="नदी" checked> नदी</label>
-            <label class="filter-item"><input type="checkbox" value="लता" checked> लता</label>
-            <label class="filter-item"><input type="checkbox" value="माला" checked> माला</label>
-            <label class="filter-item"><input type="checkbox" value="वन" checked> वनम्</label>
-            <label class="filter-item"><input type="checkbox" value="फल" checked> फलम्</label>
-            <label class="filter-item"><input type="checkbox" value="तद्" checked> तद् (सः/सा)</label>
-            <label class="filter-item"><input type="checkbox" value="एतद्" checked> एतद् (एषः)</label>
-            <label class="filter-item"><input type="checkbox" value="किम्" checked> किम् (कः/का)</label>
+            <label class="filter-item"><input type="checkbox" value="रामशब्दः" checked> रामः</label>
+            <label class="filter-item"><input type="checkbox" value="देवशब्दः" checked> देवः</label>
+            <label class="filter-item"><input type="checkbox" value="नदीशब्दः" checked> नदी</label>
+            <label class="filter-item"><input type="checkbox" value="लताशब्दः" checked> लता</label>
+            <label class="filter-item"><input type="checkbox" value="मालाशब्दः" checked> माला</label>
+            <label class="filter-item"><input type="checkbox" value="वनशब्दः" checked> वनम्</label>
+            <label class="filter-item"><input type="checkbox" value="फलशब्दः" checked> फलम्</label>
+            <label class="filter-item"><input type="checkbox" value="तच्छब्दः" checked> तद् (सः/सा)</label>
+            <label class="filter-item"><input type="checkbox" value="एतच्छब्दः" checked> एतद् (एषः)</label>
+            <label class="filter-item"><input type="checkbox" value="किम्शब्दः" checked> किम् (कः/का)</label>
         </div>
         <button class="btn" onclick="generateCustomQuiz()">प्रश्नोत्तरी आरभ्यताम् (Start Quiz)</button>
         <div id="error-msg">कृपया न्यूनतिन्यूनं एकं विकल्पं चिन्वन्तु!</div>
@@ -115,46 +115,28 @@
             }
         });
         if (masterQuestions.length === 0) {
-            document.getElementById('setup-screen').innerHTML = "<div style='color:var(--danger); font-weight:bold;'>त्रुटिः: डेटा-सञ्चिका न मिलिता। कृपया सञ्चिकाः पश्यन्तु।</div>";
+            document.getElementById('setup-screen').innerHTML = "<div style='color:var(--danger); font-weight:bold;'>त्रुटिः: डेटा-सञ्चिका न मिलिता।</div>";
         }
     }
 
-    // Bulletproof filtration engine separating nouns and pronouns completely
+    // Exact Tag Filter Engine to completely block textual overlaps
     function generateCustomQuiz() {
         const checkboxes = document.querySelectorAll('.filter-grid input[type="checkbox"]');
-        let selectedValues = [];
-        checkboxes.forEach(cb => { if (cb.checked) selectedValues.push(cb.value); });
+        let selectedTags = [];
+        checkboxes.forEach(cb => { if (cb.checked) selectedTags.push(cb.value); });
 
-        if (selectedValues.length === 0) {
+        if (selectedTags.length === 0) {
             document.getElementById('error-msg').style.display = 'block';
             return;
         }
         document.getElementById('error-msg').style.display = 'none';
 
-        // Filter the question deck strictly using explicit tag limits
+        // Filter executing an absolute, unambiguous keyword search
         filteredQuestions = masterQuestions.filter(q => {
             const topicText = q.topic || q.t || "";
-            
-            return selectedValues.some(val => {
-                // Strict isolation for Pronouns
-                if (val === "तद्") return topicText.includes("तच्छब्दः");
-                if (val === "एतद्") return topicText.includes("एतच्छब्दः");
-                if (val === "किम्") return topicText.includes("किम्शब्दः");
-                
-                // Strict isolation for Nouns (Prevents partial overlaps)
-                if (val === "राम") return topicText.includes("रामशब्दः");
-                if (val === "देव") return topicText.includes("देवशब्दः");
-                if (val === "नदी") return topicText.includes("नदीशब्दः");
-                if (val === "लता") return topicText.includes("लताशब्दः");
-                if (val === "माला") return topicText.includes("मालाशब्दः");
-                if (val === "वन") return topicText.includes("वनशब्दः");
-                if (val === "फल") return topicText.includes("फलशब्दः");
-                
-                return false;
-            });
+            return selectedTags.some(tag => topicText.includes(val = tag));
         });
 
-        // Pull exactly 10 questions at random from the strictly filtered pool
         active = [...filteredQuestions].sort(() => 0.5 - Math.random()).slice(0, Math.min(10, filteredQuestions.length));
         idx = 0; score = 0; mistakes = [];
         
