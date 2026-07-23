@@ -162,6 +162,31 @@
         });
     }
 
+        // Strict filtration engine checking exact topic names to match user selection
+    function applyFilters() {
+        const checkboxes = document.querySelectorAll('.filter-grid input[type="checkbox"]');
+        let selectedValues = [];
+        checkboxes.forEach(cb => { if (cb.checked) selectedValues.push(cb.value); });
+
+        filteredQuestions = masterQuestions.filter(q => {
+            const topicText = q.topic || q.t || "";
+            
+            // This forces the program to strictly separate the categories
+            return selectedValues.some(val => {
+                if (val === "तद्") return topicText.includes("तच्छब्दः");
+                if (val === "एतद्") return topicText.includes("एतच्छब्दः");
+                if (val === "किम्") return topicText.includes("किम्शब्दः");
+                return topicText.includes(val + "शब्दः");
+            });
+        });
+
+        startRound();
+    }
+
+
+
+    
+
     function select(el, opt) {
         const items = document.querySelectorAll('.item'); const f = document.getElementById('f-box'); const q = active[idx];
         items.forEach(i => i.classList.add('disabled'));
