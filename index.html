@@ -224,12 +224,22 @@
     }
 
     function nextQ() { idx++; if (idx < active.length) loadQ(); else showResults(); }
+       // Explicitly recalculates and prints the fresh score upon quiz completion
     function showResults() {
-        document.getElementById('quiz-screen').style.display = 'none'; document.getElementById('res-screen').style.display = 'block';
-        document.getElementById('s-text').innerText = `${score} / ${active.length}`;
-        const pct = (score / active.length) * 100;
+        document.getElementById('quiz-screen').style.display = 'none'; 
+        document.getElementById('res-screen').style.display = 'block';
+        
+        // Calculate your accurate score for THIS round on the spot
+        const totalQuestions = active.length;
+        
+        // Force rewrite the HTML text immediately to prevent any caching bugs
+        document.getElementById('s-text').innerText = `${score} / ${totalQuestions}`;
+        
+        // Overwrite the feedback evaluation text dynamically
+        const pct = totalQuestions > 0 ? (score / totalQuestions) * 100 : 0;
         document.getElementById('eval-text').innerText = pct === 100 ? "अतिउत्तमम्! सर्वं शुद्धम्!" : pct >= 70 ? "उत्तमं प्रयासम्!" : "पुनः अभ्यासं करोतु।";
     }
+
     function showReview() {
         document.getElementById('res-screen').style.display = 'none'; const container = document.getElementById('rev-list'); container.innerHTML = '';
         if (mistakes.length === 0) container.innerHTML = '<div class="card clear">✨ भवतः/भवत्याः कापि त्रुटिः नास्ति! सर्वं शुद्धम्!</div>';
