@@ -221,7 +221,20 @@
         document.getElementById('rev-screen').style.display = 'block';
     }
     function hideReview() { document.getElementById('rev-screen').style.display = 'none'; document.getElementById('res-screen').style.display = 'block'; }
-    function backToSetup() { document.getElementById('quiz-screen').style.display = 'none'; document.getElementById('setup-screen').style.display = 'block'; }
+        // Safety exit function that flushes game data and resets counters back to zero
+    function backToSetup() { 
+        // 1. Flush memory caches to stop score freezing bugs
+        idx = 0; 
+        score = 0; 
+        mistakes = []; 
+        active = [];
+
+        // 2. Safely swap visibility layers back to the selection screen
+        document.getElementById('quiz-screen').style.display = 'none'; 
+        document.getElementById('res-screen').style.display = 'none'; 
+        document.getElementById('setup-screen').style.display = 'block'; 
+    }
+
     window.addEventListener('DOMContentLoaded', initQuiz);
 </script>
 </body>
