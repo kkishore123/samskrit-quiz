@@ -11,9 +11,17 @@
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
         .quiz-container { max-width: 600px; width: 100%; background: var(--card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h1 { text-align: center; color: var(--primary); margin-top: 0; }
+        h1 { text-align: center; color: var(--primary); margin-top: 0; margin-bottom: 15px; }
+        
+        /* New Filter Menu Styles */
+        .filter-section { background: #f1f2f6; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .filter-title { font-weight: bold; margin-bottom: 10px; font-size: 0.95rem; color: var(--primary); }
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+        .filter-item { display: flex; align-items: center; font-size: 0.9rem; cursor: pointer; }
+        .filter-item input { margin-right: 6px; cursor: pointer; }
+        
         .progress { font-size: 0.9rem; color: #7f8c8d; text-align: right; margin-bottom: 10px; }
-        .tag { display: inline-block; background: #f1f2f6; color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 15px; }
+        .tag { display: inline-block; background: #eef2f7; color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 15px; }
         .question { font-size: 1.25rem; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
         .options { list-style: none; padding: 0; margin-bottom: 20px; }
         .item { background: var(--bg); border: 2px solid #e2e8f0; padding: 12px 18px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
@@ -38,6 +46,23 @@
 </head>
 <body>
 <div class="quiz-container">
+    <!-- Checkbox Filter Menu at the Top -->
+    <div class="filter-section" id="filter-menu">
+        <div class="filter-title">शब्द-चयनम् (Select Words to Quiz):</div>
+        <div class="filter-grid">
+            <label class="filter-item"><input type="checkbox" value="राम" checked onchange="applyFilters()"> रामः</label>
+            <label class="filter-item"><input type="checkbox" value="देव" checked onchange="applyFilters()"> देवः</label>
+            <label class="filter-item"><input type="checkbox" value="नदी" checked onchange="applyFilters()"> नदी</label>
+            <label class="filter-item"><input type="checkbox" value="लता" checked onchange="applyFilters()"> लता</label>
+            <label class="filter-item"><input type="checkbox" value="माला" checked onchange="applyFilters()"> माला</label>
+            <label class="filter-item"><input type="checkbox" value="वन" checked onchange="applyFilters()"> वनम्</label>
+            <label class="filter-item"><input type="checkbox" value="फल" checked onchange="applyFilters()"> फलम्</label>
+            <label class="filter-item"><input type="checkbox" value="तद्" checked onchange="applyFilters()"> तद् (सः/सा)</label>
+            <label class="filter-item"><input type="checkbox" value="एतद्" checked onchange="applyFilters()"> एतद् (एषः)</label>
+            <label class="filter-item"><input type="checkbox" value="किम्" checked onchange="applyFilters()"> किम् (कः/का)</label>
+        </div>
+    </div>
+
     <div id="quiz-screen">
         <h1 id="quiz-title">संस्कृत-व्याकरण-प्रश्नोत्तरी</h1>
         <div class="progress" id="p-text">प्रश्न संख्या: 1 / 10</div>
@@ -68,7 +93,8 @@
 <script src="quiz-nouns.js"></script>
 <script src="quiz-pronouns.js"></script>
 <script>
-    let masterQuestions = [], active = [], idx = 0, score = 0, mistakes = [];
+    let masterQuestions = [], filteredQuestions = [], active = [], idx = 0, score = 0, mistakes = [];
+    
     function initQuiz() {
         masterQuestions = [];
         const sources = ['nounQuestions', 'pronounQuestions', 'db', 'quizData'];
@@ -78,16 +104,46 @@
                 masterQuestions = masterQuestions.concat(items);
             }
         });
-        if (masterQuestions.length > 0) startRound();
-        else document.getElementById('q-text').innerText = "त्रुटिः: डेटा-सञ्चिका न मिलिता।";
+        if (masterQuestions.length > 0) {
+            applyFilters();
+        } else {
+            document.getElementById('q-text').innerText = "त्रुटिः: डेटा-सञ्चिका न मिलिता।";
+        }
     }
+
+    // Dynamic filtration filter engine mapping topics to checkbox keys
+    function applyFilters() {
+        const checkboxes = document.querySelectorAll('.filter-grid input[type="checkbox"]');
+        let selectedValues = [];
+        checkboxes.forEach(cb => { if (cb.checked) selectedValues.push(cb.value); });
+
+        filteredQuestions = masterQuestions.filter(q => {
+            const topicText = q.topic || q.t || "";
+            return selectedValues.some(val => topicText.includes(val));
+        });
+
+        startRound();
+    }
+
     function startRound() {
         document.getElementById('res-screen').style.display = 'none';
         document.getElementById('quiz-screen').style.display = 'block';
-        active = [...masterQuestions].sort(() => 0.5 - Math.random()).slice(0, Math.min(10, masterQuestions.length));
+        document.getElementById('filter-menu').style.display = 'block'; // Ensure selection menu is visible
+        
+        if (filteredQuestions.length === 0) {
+            document.getElementById('p-text').innerText = "प्रश्न संख्या: 0 / 0";
+            document.getElementById('t-text').innerText = "रिक्तम्";
+            document.getElementById('q-text').innerText = "कृपया कमपि एकं शब्दं चिन्वन्तु! (Please check at least one word selection above!)";
+            document.getElementById('o-box').innerHTML = '';
+            document.getElementById('n-btn').style.display = 'none';
+            return;
+        }
+
+        active = [...filteredQuestions].sort(() => 0.5 - Math.random()).slice(0, Math.min(10, filteredQuestions.length));
         idx = 0; score = 0; mistakes = [];
         loadQ();
     }
+
     function loadQ() {
         const q = active[idx];
         document.getElementById('p-text').innerText = `प्रश्न संख्या: ${idx + 1} / ${active.length}`;
@@ -103,6 +159,7 @@
             li.onclick = () => select(li, opt); box.appendChild(li);
         });
     }
+
     function select(el, opt) {
         const items = document.querySelectorAll('.item'); const f = document.getElementById('f-box'); const q = active[idx];
         items.forEach(i => i.classList.add('disabled'));
@@ -117,14 +174,17 @@
         }
         document.getElementById('n-btn').style.display = 'block';
     }
+
     function toggleHint() {
         const box = document.getElementById('h-box'); const q = active[idx];
         box.innerText = q.hint || q.h || "सङ्केतः नास्ति।";
         box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
     }
+
     function nextQ() { idx++; if (idx < active.length) loadQ(); else showResults(); }
     function showResults() {
         document.getElementById('quiz-screen').style.display = 'none'; document.getElementById('res-screen').style.display = 'block';
+        document.getElementById('filter-menu').style.display = 'none'; // Hide filters on completion screen
         document.getElementById('s-text').innerText = `${score} / ${active.length}`;
         const pct = (score / active.length) * 100;
         document.getElementById('eval-text').innerText = pct === 100 ? "अतिउत्तमम्! सर्वं शुद्धम्!" : pct >= 70 ? "उत्तमं प्रयासम्!" : "पुनः अभ्यासं करोतु।";
