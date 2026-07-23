@@ -37,20 +37,18 @@
     </style>
 </head>
 <body>
-
 <div class="quiz-container">
     <div id="quiz-screen">
         <h1 id="quiz-title">संस्कृत-व्याकरण-प्रश्नोत्तरी</h1>
         <div class="progress" id="p-text">प्रश्न संख्या: 1 / 10</div>
         <div class="tag" id="t-text">विषयः</div>
-        <div class="question" id="q-text">प्रश्नः</div>
+        <div class="question" id="q-text">प्रश्नाः लोड हुँदैछन्...</div>
         <ul class="options" id="o-box"></ul>
         <button class="btn-hint" onclick="toggleHint()">सङ्केतः (Hint)</button>
         <div class="box" id="h-box"></div>
         <div class="fb" id="f-box"></div>
         <div class="actions"><div></div><button class="btn" id="n-btn" style="display:none;" onclick="nextQ()">अग्रिमप्रश्नः</button></div>
     </div>
-
     <div class="screen" id="res-screen">
         <h1>प्रश्नोत्तरी समाप्ता</h1>
         <p>भवतः/भवत्याः अङ्काः (Your Score):</p>
@@ -61,139 +59,90 @@
             <button class="btn" onclick="startRound()">नूतन-पर्यायः आरभ्यताम् (One More Round)</button>
         </div>
     </div>
-
     <div class="screen" id="rev-screen">
         <h1>त्रुटि-संशोधनम् (Revision)</h1>
         <div id="rev-list"></div>
         <div class="group"><button class="btn" onclick="hideReview()">परिणाम-फलकम् प्रति गच्छतु</button></div>
     </div>
 </div>
-
-<!-- Linking your separate local script data streams -->
 <script src="quiz-nouns.js"></script>
 <script src="quiz-pronouns.js"></script>
-
 <script>
     let masterQuestions = [], active = [], idx = 0, score = 0, mistakes = [];
-
     function initQuiz() {
-        // Checking for nounQuestions array or fallback to a standard global db array
-        let nouns = typeof nounQuestions !== 'undefined' ? nounQuestions : (typeof db !== 'undefined' ? db : []);
-        let pronouns = typeof pronounQuestions !== 'undefined' ? pronounQuestions : [];
-
-        masterQuestions = [...nouns, ...pronouns];
-
-        if (masterQuestions.length > 0) {
-            startRound();
-        } else {
-            document.getElementById('q-text').innerText = "त्रुटिः: डेटा-सञ्चिका न मिलिता। कृपया सञ्चिकानामानि पश्यन्तु।";
-        }
+        masterQuestions = [];
+        const sources = ['nounQuestions', 'pronounQuestions', 'db', 'quizData'];
+        sources.forEach(v => {
+            if (window[v]) {
+                let items = Array.isArray(window[v]) ? window[v] : (window[v].questions || []);
+                masterQuestions = masterQuestions.concat(items);
+            }
+        });
+        if (masterQuestions.length > 0) startRound();
+        else document.getElementById('q-text').innerText = "त्रुटिः: डेटा-सञ्चिका न मिलिता।";
     }
-
     function startRound() {
         document.getElementById('res-screen').style.display = 'none';
         document.getElementById('quiz-screen').style.display = 'block';
-        active = [...masterQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        active = [...masterQuestions].sort(() => 0.5 - Math.random()).slice(0, Math.min(10, masterQuestions.length));
         idx = 0; score = 0; mistakes = [];
         loadQ();
     }
-
     function loadQ() {
         const q = active[idx];
-        document.getElementById('p-text').innerText = `प्रश्न संख्या: ${idx + 1} / 10`;
-        document.getElementById('t-text').innerText = q.topic || q.t;
-        document.getElementById('q-text').innerText = q.questionText || q.q;
+        document.getElementById('p-text').innerText = `प्रश्न संख्या: ${idx + 1} / ${active.length}`;
+        document.getElementById('t-text').innerText = q.topic || q.t || "विषयः";
+        document.getElementById('q-text').innerText = q.questionText || q.q || "";
         document.getElementById('h-box').style.display = 'none';
-        
-        const f = document.getElementById('f-box');
-        f.className = 'fb'; f.style.display = 'none';
+        const f = document.getElementById('f-box'); f.className = 'fb'; f.style.display = 'none';
         document.getElementById('n-btn').style.display = 'none';
-
-        const box = document.getElementById('o-box');
-        box.innerHTML = '';
-
-        const currentOptions = q.options || q.o;
-        currentOptions.forEach((opt) => {
-            const li = document.createElement('li');
-            li.className = 'item'; li.innerText = opt.text || opt.t;
-            li.onclick = () => select(li, opt);
-            box.appendChild(li);
+        const box = document.getElementById('o-box'); box.innerHTML = '';
+        const opts = q.options || q.o || [];
+        opts.forEach((opt) => {
+            const li = document.createElement('li'); li.className = 'item'; li.innerText = opt.text || opt.t || "";
+            li.onclick = () => select(li, opt); box.appendChild(li);
         });
     }
-
     function select(el, opt) {
-        const items = document.querySelectorAll('.item');
-        const f = document.getElementById('f-box');
-        const q = active[idx];
+        const items = document.querySelectorAll('.item'); const f = document.getElementById('f-box'); const q = active[idx];
         items.forEach(i => i.classList.add('disabled'));
-
         const isCorrect = opt.isCorrect !== undefined ? opt.isCorrect : opt.c;
-        const feedbackReason = opt.reason || opt.r;
-        const currentOptions = q.options || q.o;
-
-        if (isCorrect) {
-            el.classList.add('correct'); f.innerText = feedbackReason;
-            f.className = 'fb correct'; score++;
-        } else {
-            el.classList.add('incorrect'); f.innerText = feedbackReason;
-            f.className = 'fb incorrect';
-            items.forEach((item, i) => { 
-                const checkCorrect = currentOptions[i].isCorrect !== undefined ? currentOptions[i].isCorrect : currentOptions[i].c;
-                if (checkCorrect) item.classList.add('correct'); 
-            });
-            const correctOpt = currentOptions.find(o => o.isCorrect || o.c);
-            mistakes.push({ 
-                t: q.topic || q.t, 
-                q: q.questionText || q.q, 
-                chosen: opt.text || opt.t, 
-                correct: correctOpt.text || correctOpt.t, 
-                r: feedbackReason 
-            });
+        const reason = opt.reason || opt.r || ""; const opts = q.options || q.o || [];
+        if (isCorrect) { el.classList.add('correct'); f.innerText = reason; f.className = 'fb correct'; score++; }
+        else {
+            el.classList.add('incorrect'); f.innerText = reason; f.className = 'fb incorrect';
+            items.forEach((item, i) => { if (opts[i].isCorrect || opts[i].c) item.classList.add('correct'); });
+            const correctOpt = opts.find(o => o.isCorrect || o.c) || {};
+            mistakes.push({ t: q.topic || q.t || "विषयः", q: q.questionText || q.q || "", chosen: opt.text || opt.t || "", correct: correctOpt.text || correctOpt.t || "", r: reason });
         }
         document.getElementById('n-btn').style.display = 'block';
     }
-
     function toggleHint() {
-        const box = document.getElementById('h-box');
-        const q = active[idx];
-        box.innerText = q.hint || q.h;
+        const box = document.getElementById('h-box'); const q = active[idx];
+        box.innerText = q.hint || q.h || "सङ्केतः नास्ति।";
         box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
     }
-
-    function nextQ() {
-        idx++;
-        if (idx < 10 && idx < active.length) loadQ(); else showResults();
-    }
-
+    function nextQ() { idx++; if (idx < active.length) loadQ(); else showResults(); }
     function showResults() {
-        document.getElementById('quiz-screen').style.display = 'none';
-        document.getElementById('res-screen').style.display = 'block';
+        document.getElementById('quiz-screen').style.display = 'none'; document.getElementById('res-screen').style.display = 'block';
         document.getElementById('s-text').innerText = `${score} / ${active.length}`;
         const pct = (score / active.length) * 100;
         document.getElementById('eval-text').innerText = pct === 100 ? "अतिउत्तमम्! सर्वं शुद्धम्!" : pct >= 70 ? "उत्तमं प्रयासम्!" : "पुनः अभ्यासं करोतु।";
     }
-
     function showReview() {
-        document.getElementById('res-screen').style.display = 'none';
-        const container = document.getElementById('rev-list');
-        container.innerHTML = '';
-        
-        if (mistakes.length === 0) {
-            container.innerHTML = '<div class="card clear">✨ भवतः/भवत्याः कापि त्रुटिः नास्ति! सर्वं शुद्धम्!</div>';
-        } else {
+        document.getElementById('res-screen').style.display = 'none'; const container = document.getElementById('rev-list'); container.innerHTML = '';
+        if (mistakes.length === 0) container.innerHTML = '<div class="card clear">✨ भवतः/भवत्याः कापि त्रुटिः नास्ति! सर्वं शुद्धम्!</div>';
+        else {
             mistakes.forEach(m => {
-                const div = document.createElement('div');
-                div.className = 'card';
+                const div = document.createElement('div'); div.className = 'card';
                 div.innerHTML = `<strong>विषयः:</strong> ${m.t}<br><strong>प्रश्नः:</strong> ${m.q}<br><span style="color:var(--danger)"><strong>भवतः उत्तरम्:</strong> ${m.chosen}</span><br><span style="color:var(--success)"><strong>शुद्धम् उत्तरम्:</strong> ${m.correct}</span><br><small style="color:#7f8c8d"><strong>विवरणम्:</strong> ${m.r}</small>`;
                 container.appendChild(div);
             });
         }
         document.getElementById('rev-screen').style.display = 'block';
     }
-
-    function hideReview() {
-        document.getElementById('rev-screen').style.display = 'none';
-        document.getElementById('res-screen').style.display = 'block';
-    }
-    
+    function hideReview() { document.getElementById('rev-screen').style.display = 'none'; document.getElementById('res-screen').style.display = 'block'; }
     window.addEventListener('DOMContentLoaded', initQuiz);
+</script>
+</body>
+</html>
