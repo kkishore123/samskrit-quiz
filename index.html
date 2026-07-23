@@ -33,11 +33,15 @@
         .btn:hover { background: var(--hover); }
         .btn-hint { background: none; border: 1px solid #cbd5e1; color: #475569; padding: 6px 14px; border-radius: 6px; cursor: pointer; display: inline-block; margin-bottom: 10px; }
         
+        /* Cancel Button Style Styling Framework */
+        .btn-break { background: #e74c3c !important; color: white !important; margin-right: auto; }
+        .btn-break:hover { background: #c0392b !important; }
+        
         .box { display: none; background: var(--hint); padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid var(--primary); text-align: left; }
         .fb { margin-top: 15px; padding: 12px; border-radius: 8px; font-weight: 500; display: none; text-align: left; }
         .fb.correct { display: block; background: #d4edda; color: #155724; }
         .fb.incorrect { display: block; background: #f8d7da; color: #721c24; }
-        .actions { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--bg); }
+        .actions { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--bg); align-items: center; }
         .screen { display: none; text-align: center; }
         .score { font-size: 3rem; font-weight: bold; color: var(--primary); margin: 15px 0; }
         .group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
@@ -84,7 +88,11 @@
         <div style="text-align: left;"><button class="btn-hint" onclick="toggleHint()">सङ्केतः (Hint)</button></div>
         <div class="box" id="h-box"></div>
         <div class="fb" id="f-box"></div>
-        <div class="actions"><div></div><button class="btn" id="n-btn" style="display:none;" onclick="nextQ()">अग्रिमप्रश्नः</button></div>
+        <div class="actions">
+            <!-- Break Cancel Navigation Switch Button Injection Component -->
+            <button class="btn btn-break" onclick="backToSetup()">विरामः (Break)</button>
+            <button class="btn" id="n-btn" style="display:none;" onclick="nextQ()">अग्रिमप्रश्नः</button>
+        </div>
     </div>
     <!-- Screen 3: Final Scoreboard Panel -->
     <div class="screen" id="res-screen">
@@ -125,8 +133,7 @@
         }
     }
 
-    // Absolute Exact Match Filter Engine to guarantee zero leakage overlaps
-        // Enhanced filtration and true-randomization shuffling engine
+    // Fisher-Yates Complete Random Mixing Filter Configuration
     function generateCustomQuiz() {
         const checkboxes = document.querySelectorAll('.filter-grid input[type="checkbox"]');
         let selectedTags = [];
@@ -138,31 +145,18 @@
         }
         document.getElementById('error-msg').style.display = 'none';
 
-        // 1. Gather all questions matching the checked terms
         filteredQuestions = masterQuestions.filter(q => {
             const topicText = q.topic || q.t || "";
             return selectedTags.some(tag => topicText === tag);
         });
 
-        // 2. Perform a True Fisher-Yates shuffle across the ENTIRE filtered pool
-        // This mixes all 300+ questions up completely before we take the top 10
+        // Thoroughly shuffle the full question bank deck before taking the top 10
         for (let i = filteredQuestions.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [filteredQuestions[i], filteredQuestions[j]] = [filteredQuestions[j], filteredQuestions[i]];
         }
 
-        // 3. Slice out exactly 10 questions from the completely scrambled deck
         active = filteredQuestions.slice(0, Math.min(10, filteredQuestions.length));
-        idx = 0; score = 0; mistakes = [];
-        
-        document.getElementById('setup-screen').style.display = 'none';
-        document.getElementById('quiz-screen').style.display = 'block';
-        loadQ();
-    }
-
-
-        // Pull exactly 10 questions at random from the tightly filtered pool
-        active = [...filteredQuestions].sort(() => 0.5 - Math.random()).slice(0, Math.min(10, filteredQuestions.length));
         idx = 0; score = 0; mistakes = [];
         
         document.getElementById('setup-screen').style.display = 'none';
@@ -227,7 +221,7 @@
         document.getElementById('rev-screen').style.display = 'block';
     }
     function hideReview() { document.getElementById('rev-screen').style.display = 'none'; document.getElementById('res-screen').style.display = 'block'; }
-    function backToSetup() { document.getElementById('res-screen').style.display = 'none'; document.getElementById('setup-screen').style.display = 'block'; }
+    function backToSetup() { document.getElementById('quiz-screen').style.display = 'none'; document.getElementById('setup-screen').style.display = 'block'; }
     window.addEventListener('DOMContentLoaded', initQuiz);
 </script>
 </body>
