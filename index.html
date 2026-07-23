@@ -1,115 +1,295 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sa">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Samskritam Vibhakti Quiz</title>
-    <script src="https://tailwindcss.com"></script>
+    <title>संस्कृत-व्याकरण-प्रश्नोत्तरी</title>
+    <style>
+        :root {
+            --primary: #8e44ad;
+            --primary-hover: #732d91;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --success: #27ae60;
+            --danger: #c0392b;
+            --hint-bg: #eef2f7;
+            --hint-text: #475569;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .quiz-container {
+            max-width: 650px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 15px;
+        }
+
+        .progress {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        .topic-tag {
+            display: inline-block;
+            background: #f1f2f6;
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .question {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+
+        .option-item {
+            background: var(--bg);
+            border: 2px solid #e2e8f0;
+            padding: 14px 20px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            border-color: var(--primary);
+            background: #fbf7fc;
+        }
+
+        .option-item.correct {
+            background-color: #d4edda;
+            border-color: var(--success);
+            color: #155724;
+        }
+
+        .option-item.incorrect {
+            background-color: #f8d7da;
+            border-color: var(--danger);
+            color: #721c24;
+        }
+
+        .option-item.disabled {
+            pointer-events: none;
+        }
+
+        .hint-btn {
+            background: none;
+            border: 1px solid #cbd5e1;
+            color: var(--hint-text);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .hint-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .hint-box {
+            display: none;
+            background: var(--hint-bg);
+            color: var(--hint-text);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.95rem;
+            border-left: 4px solid var(--primary);
+            line-height: 1.4;
+        }
+
+        .feedback-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+            line-height: 1.4;
+        }
+
+        .feedback-box.correct {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .feedback-box.incorrect {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid var(--bg);
+        }
+
+        .next-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: none;
+        }
+
+        .next-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .result-screen {
+            text-align: center;
+            display: none;
+        }
+
+        .result-score {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+
+        .restart-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
 </head>
-<body class="bg-amber-50 text-slate-800 font-sans p-6">
-    <div class="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow-md border border-amber-200">
-        <h1 class="text-2xl font-bold text-center text-amber-800 mb-4">Samskritam Vibhakti Quiz</h1>
+<body>
+
+<div class="quiz-container">
+    <div id="quiz-screen">
+        <h1 id="quiz-title">संस्कृत-व्याकरण-प्रश्नोत्तरी</h1>
+        <div class="progress" id="progress-text">प्रश्न संख्या: 1 / 10</div>
         
-        <div id="quiz-container">
-            <div class="flex justify-between items-center mb-4 bg-amber-100 p-3 rounded-lg">
-                <span id="word-info" class="font-semibold text-lg">Word: -</span>
-                <button onclick="playAudio()" class="bg-amber-600 text-white px-3 py-1.5 rounded-md text-sm hover:bg-amber-700">🔊 Listen</button>
-            </div>
-            
-            <p id="question-text" class="text-lg font-medium mb-4">Identify the Vibhakti and Vachanam:</p>
-            
-            <div id="options-container" class="grid gap-3 mb-4"></div>
-            
-            <div id="feedback" class="hidden p-3 rounded-lg mb-4 text-center font-medium"></div>
-            
-            <button id="next-btn" onclick="nextQuestion()" class="hidden w-full bg-emerald-600 text-white py-2 rounded-lg font-semibold hover:bg-emerald-700">Next Question</button>
-        </div>
+        <div class="topic-tag" id="topic-text">विषयः</div>
+        <div class="question" id="question-text">प्रश्नः</div>
         
-        <div id="score-container" class="hidden text-center">
-            <h2 class="text-xl font-bold mb-2">Quiz Finished!</h2>
-            <p id="final-score" class="text-lg mb-4"></p>
-            <button onclick="restartQuiz()" class="bg-amber-600 text-white px-4 py-2 rounded-lg font-semibold">Restart</button>
+        <ul class="options-list" id="options-container">
+            <!-- Dynamic Options -->
+        </ul>
+
+        <button class="hint-btn" id="hint-button" onclick="toggleHint()">सङ्केतः (Hint)</button>
+        <div class="hint-box" id="hint-container">सङ्केत विवरणी...</div>
+
+        <div class="feedback-box" id="feedback-container"></div>
+
+        <div class="action-container">
+            <div></div> <!-- Spacer -->
+            <button class="next-btn" id="next-button" onclick="nextQuestion()">अग्रिमप्रश्नः (Next)</button>
         </div>
     </div>
 
-    <script>
-        const quizData = [
-            { word: "रामः", vibhakti: "Prathama Vibhakti, Ekavachanam", options: ["Prathama Vibhakti, Ekavachanam", "Dvitiya Vibhakti, Ekavachanam", "Tritiya Vibhakti, Bahuvachanam"] },
-            { word: "रामाय", vibhakti: "Chaturthi Vibhakti, Ekavachanam", options: ["Prathama Vibhakti, Ekavachanam", "Chaturthi Vibhakti, Ekavachanam", "Shashthi Vibhakti, Dvivachanam"] },
-            { word: "तेन", vibhakti: "Tritiya Vibhakti, Ekavachanam", options: ["Panchami Vibhakti, Ekavachanam", "Tritiya Vibhakti, Ekavachanam", "Saptami Vibhakti, Bahuvachanam"] }
-        ];
+    <div class="result-screen" id="result-screen">
+        <h1>प्रश्नोत्तरी समाप्ता</h1>
+        <p>भवतः/भवत्याः अङ्काः (Your Score):</p>
+        <div class="result-score" id="score-text">0 / 10</div>
+        <p id="result-evaluation">उत्तमं प्रयासम्!</p>
+        <button class="restart-btn" onclick="restartQuiz()">पुनः आरम्भः करोतु (Restart)</button>
+    </div>
+</div>
 
-        let currentIdx = 0;
-        let score = 0;
-
-        function loadQuestion() {
-            const q = quizData[currentIdx];
-            document.getElementById("word-info").innerText = `Padam: ${q.word}`;
-            document.getElementById("question-text").innerText = `What is the correct form for "${q.word}"?`;
-            
-            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
-            const container = document.getElementById("options-container");
-            container.innerHTML = "";
-            
-            shuffledOptions.forEach(opt => {
-                const btn = document.createElement("button");
-                btn.innerText = opt;
-                btn.className = "w-full text-left p-3 rounded-lg border border-slate-200 hover:bg-amber-50 font-medium transition";
-                btn.onclick = () => selectAnswer(opt, q.vibhakti, btn);
-                container.appendChild(btn);
-            });
-
-            document.getElementById("feedback").classList.add("hidden");
-            document.getElementById("next-btn").classList.add("hidden");
-        }
-
-        function selectAnswer(selected, correct, button) {
-            const feedback = document.getElementById("feedback");
-            feedback.classList.remove("hidden");
-            
-            const buttons = document.querySelectorAll("#options-container button");
-            buttons.forEach(b => b.disabled = true);
-
-            if (selected === correct) {
-                score++;
-                button.classList.add("bg-emerald-100", "border-emerald-500", "text-emerald-800");
-                feedback.innerText = "Correct! साधu (Sadhu)!";
-                feedback.className = "p-3 rounded-lg mb-4 text-center font-medium bg-emerald-100 text-emerald-800";
-            } else {
-                button.classList.add("bg-rose-100", "border-rose-500", "text-rose-800");
-                feedback.innerText = `Incorrect. Correct answer is: ${correct}`;
-                feedback.className = "p-3 rounded-lg mb-4 text-center font-medium bg-rose-100 text-rose-800";
-            }
-            document.getElementById("next-btn").classList.remove("hidden");
-        }
-
-        function nextQuestion() {
-            currentIdx++;
-            if (currentIdx < quizData.length) {
-                loadQuestion();
-            } else {
-                document.getElementById("quiz-container").classList.add("hidden");
-                document.getElementById("score-container").classList.remove("hidden");
-                document.getElementById("final-score").innerText = `You scored ${score} out of ${quizData.length}`;
-            }
-        }
-
-        function playAudio() {
-            const text = quizData[currentIdx].word;
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'sa-IN'; // Sanskrit fallback to hi-IN if unsupported
-            window.speechSynthesis.speak(utterance);
-        }
-
-        function restartQuiz() {
-            currentIdx = 0;
-            score = 0;
-            document.getElementById("quiz-container").classList.remove("hidden");
-            document.getElementById("score-container").classList.add("hidden");
-            loadQuestion();
-        }
-
-        loadQuestion();
-    </script>
-</body>
-</html>
+<script>
+    const quizData = {
+      "quizTitle": "संस्कृत-व्याकरणम्: शब्दरूपाणि (संज्ञा सर्वनाम च)",
+      "questions": [
+        {
+          "topic": "अकारान्तपुंलिङ्ग-रामशब्दः",
+          "questionText": "रामशब्दस्य तृतीयाविभक्तेः एकवचनरूपं किम्?",
+          "hint": "अयं शब्दः अकारान्तः पुंलिङ्गः अस्ति। बालकशब्दवत् रूपं भवति।",
+          "options": [
+            { "text": "रामम्", "isCorrect": false, "reason": "असमीचीनम्। एषा द्वितीयाविभक्तेः एकवचनम् अस्ति।" },
+            { "text": "रामस्य", "isCorrect": false, "reason": "असमीचीनम्। एषा षष्ठीविभक्तेः एकवचनम् अस्ति।" },
+            { "text": "रामेण", "isCorrect": true, "reason": "साधु! 'रामेण' इति तृतीयाविभक्तेः एकवचनरूपम् अस्ति।" },
+            { "text": "रामात्", "isCorrect": false, "reason": "असमीचीनम्। एषा पञ्चमीविभक्तेः एकवचनम् अस्ति।" }
+          ]
+        },
+        {
+          "topic": "ईकारान्तस्त्रीलिङ्ग-नदीशब्दः",
+          "questionText": "नदीशब्दस्य द्वितीयाविभक्तेः एकवचनरूपं किम्?",
+          "hint": "अयं शब्दः ईकारान्तः स्त्रीलिङ्गः अस्ति। गौरीशब्दवत् रूपं भवति।",
+          "options": [
+            { "text": "नद्यौ", "isCorrect": false, "reason": "असमीचीनम्। एषा प्रथमाविभक्तेः द्विवचनम् अस्ति।" },
+            { "text": "नदीम्", "isCorrect": true, "reason": "अतिशोभनम्! 'नदीम्' इति द्वितीयाविभक्तेः एकवचनरूपम् अस्ति।" },
+            { "text": "नद्याः", "isCorrect": false, "reason": "असमीचीनम्। एषा पञ्चमी अथवा षष्ठीविभक्तेः एकवचनम् अस्ति।" },
+            { "text": "नद्याम्", "isCorrect": false, "reason": "असमीचीनम्। एषा सप्तमीविभक्तेः एकवचनम् अस्ति।" }
+          ]
+        },
+        {
+          "topic": "आकारान्तस्त्रीलिङ्ग-लताशब्दः",
+          "questionText": "लताशब्दस्य चतुर्थीविभक्तेः एकवचनरूपं किम्?",
+          "hint": "अयं शब्दः आकारान्तः स्त्रीलिङ्गः अस्ति। बालिकाशब्दवत् रूपं भवति।",
+          "options": [
+            { "text": "लतायाः", "isCorrect": false, "reason": "असमीचीनम्। एषा पञ्चमी अथवा षष्ठीविभक्तेः एकवचनम् अस्ति।" },
+            { "text": "लताम्", "isCorrect": false, "reason": "असमीचीनम्। एषा द्वितीयाविभक्तेः एकवचनम् अस्ति।" },
+            { "text": "लतायै", "isCorrect": true, "reason": "साधु! 'लतायै' इति चतुर्थीविभक्तेः एकवचनरूपम् अस्ति।" },
+            { "text": "लतया", "isCorrect": false, "reason": "असमीचीनम्। एषा तृतीयाविभक्तेः एकवचनम् अस्ति।" }
+          ]
+        },
+        {
+          "topic": "अकारान्तनपुंसकलिङ्ग-वनशब्दः",
+          "questionText": "वनशब्दस्य सप्तमीविभक्तेः एकवचनरूपं किम्?",
+          "hint": "अयं शब्दः अकारान्तः नपुंसकलिङ्गः अस्ति। फलशब्दवत् रूपं भवति।",
+          "options": [
+            { "text": "वने", "isCorrect": true, "reason": "उत्तमम्! 'वने' इति सप्तमीविभक्तेः एकवचनरूपम् अस्ति।" },
+            { "text": "वनात्", "isCorrect": false, "reason": "असमीचीनम्। एषा पञ्चमीविभक्तेः एकवचनम् अस्ति।" },
+            { "text": "वनस्य", "isCorrect": false, "reason": "असमीचीनम्। एषा षष्ठीविभक्तेः एकवचनम् अस्ति।" },
+            { "text": "वनेन", "isCorrect": false, "reason": "असमीचीनम्। एषा तृतीयाविभक्तेः एकवचनम् अस्ति।" }
+          ]
+        },
+        {
+          "topic": "सर्वनाम-तच्छब्दः (पुंलिङ्गः - सः)",
+          "questionText": "तद् (पुंलिङ्ग) शब्दस्य प्रथमाविभक्तेः बहुवचनरूपं किम्?",
+          "hint": "सः, तौ, ... इति क्रमेण पुंलिङ्गे रूपाणि भवन्ति।",
+          "options": [
+            { "text": "ताः", "isCorrect": false, "reason": "असमीचीनम्। 'ताः' इति स्त्रीलिङ्गे प्रथमाविभक्तेः बहुवचनम् अस्ति।" },
+            { "text": "ते", "isCorrect": true, "reason": "सम्यक्! 'ते' इति पुंलिङ्गे प्रथमाविभक्तेः बहुवचनरूपम् अस्ति।" },
