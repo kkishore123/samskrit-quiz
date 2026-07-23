@@ -1,4 +1,4 @@
-const nounQuestions = [
+window.nounQuestions = [
   {
     "topic": "अकारान्तपुंलिङ्ग-रामशब्दः",
     "questionText": "रामशब्दस्य तृतीयाविभक्तेः एकवचनरूपं किम्?",
