@@ -69,25 +69,32 @@
     </div>
 </div>
 
-<script>
-    let db = [], active = [], idx = 0, score = 0, mistakes = [];
+<!-- Local source injection linking directly to your pre-existing data arrays -->
+<script src="quiz-nouns.js"></script>
+<script src="quiz-pronouns.js"></script>
 
-    async function initQuiz() {
-        try {
-            document.getElementById('q-text').innerText = "प्रश्नाः लोड हुँदैछन्... (Loading Questions...)";
-            // Pulling data stream over cloud to avoid layout window spill limits
-            const res = await fetch('https://jsonsilo.com');
-            db = await res.json();
+<script>
+    let masterQuestions = [], active = [], idx = 0, score = 0, mistakes = [];
+
+    function initQuiz() {
+        let nounsExist = (typeof nounQuestions !== 'undefined');
+        let pronounsExist = (typeof pronounQuestions !== 'undefined');
+
+        if (nounsExist || pronounsExist) {
+            masterQuestions = [];
+            // Merge both files seamlessly into one collection
+            if (nounsExist) masterQuestions = masterQuestions.concat(nounQuestions);
+            if (pronounsExist) masterQuestions = masterQuestions.concat(pronounQuestions);
             startRound();
-        } catch (err) {
-            document.getElementById('q-text').innerText = "त्रुटिः: डेटा लोड कर्तुं न शक्यते। कृपया अन्तर्जालं पश्यन्तु। (Error fetching cloud repository data)";
+        } else {
+            document.getElementById('q-text').innerText = "त्रुटिः: डेटा-सञ्चिका न मिलिता। (Error: Make sure your variable names match)";
         }
     }
 
     function startRound() {
         document.getElementById('res-screen').style.display = 'none';
         document.getElementById('quiz-screen').style.display = 'block';
-        active = [...db].sort(() => 0.5 - Math.random()).slice(0, 10);
+        active = [...masterQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
         idx = 0; score = 0; mistakes = [];
         loadQ();
     }
@@ -95,8 +102,9 @@
     function loadQ() {
         const q = active[idx];
         document.getElementById('p-text').innerText = `प्रश्न संख्या: ${idx + 1} / 10`;
-        document.getElementById('t-text').innerText = q.t;
-        document.getElementById('q-text').innerText = q.q;
+        // Accommodate variations in object formatting ('topic' vs 't', 'questionText' vs 'q')
+        document.getElementById('t-text').innerText = q.topic || q.t;
+        document.getElementById('q-text').innerText = q.questionText || q.q;
         document.getElementById('h-box').style.display = 'none';
         
         const f = document.getElementById('f-box');
@@ -106,9 +114,10 @@
         const box = document.getElementById('o-box');
         box.innerHTML = '';
 
-        q.o.forEach((opt) => {
+        const currentOptions = q.options || q.o;
+        currentOptions.forEach((opt) => {
             const li = document.createElement('li');
-            li.className = 'item'; li.innerText = opt.t;
+            li.className = 'item'; li.innerText = opt.text || opt.t;
             li.onclick = () => select(li, opt);
             box.appendChild(li);
         });
@@ -120,22 +129,36 @@
         const q = active[idx];
         items.forEach(i => i.classList.add('disabled'));
 
-        if (opt.c) {
-            el.classList.add('correct'); f.innerText = opt.r;
+        const isCorrect = opt.isCorrect !== undefined ? opt.isCorrect : opt.c;
+        const feedbackReason = opt.reason || opt.r;
+        const currentOptions = q.options || q.o;
+
+        if (isCorrect) {
+            el.classList.add('correct'); f.innerText = feedbackReason;
             f.className = 'fb correct'; score++;
         } else {
-            el.classList.add('incorrect'); f.innerText = opt.r;
+            el.classList.add('incorrect'); f.innerText = feedbackReason;
             f.className = 'fb incorrect';
-            items.forEach((item, i) => { if (q.o[i].c) item.classList.add('correct'); });
-            const correctOpt = q.o.find(o => o.c);
-            mistakes.push({ t: q.t, q: q.q, chosen: opt.t, correct: correctOpt.t, r: opt.r });
+            items.forEach((item, i) => { 
+                const checkCorrect = currentOptions[i].isCorrect !== undefined ? currentOptions[i].isCorrect : currentOptions[i].c;
+                if (checkCorrect) item.classList.add('correct'); 
+            });
+            const correctOpt = currentOptions.find(o => o.isCorrect || o.c);
+            mistakes.push({ 
+                t: q.topic || q.t, 
+                q: q.questionText || q.q, 
+                chosen: opt.text || opt.t, 
+                correct: correctOpt.text || correctOpt.t, 
+                r: feedbackReason 
+            });
         }
         document.getElementById('n-btn').style.display = 'block';
     }
 
     function toggleHint() {
         const box = document.getElementById('h-box');
-        box.innerText = active[idx].h;
+        const q = active[idx];
+        box.innerText = q.hint || q.h;
         box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
     }
 
@@ -168,14 +191,11 @@
             });
         }
         document.getElementById('rev-screen').style.display = 'block';
-    }
-
+        }
+    
     function hideReview() {
         document.getElementById('rev-screen').style.display = 'none';
         document.getElementById('res-screen').style.display = 'block';
     }
-
+    
     window.addEventListener('DOMContentLoaded', initQuiz);
-</script>
-</body>
-</html>
