@@ -11,29 +11,30 @@
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
         .quiz-container { max-width: 600px; width: 100%; background: var(--card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h1 { text-align: center; color: var(--primary); margin-top: 0; margin-bottom: 15px; }
+        h1 { text-align: center; color: var(--primary); margin-top: 0; margin-bottom: 20px; }
         
-        /* New Filter Menu Styles */
-        .filter-section { background: #f1f2f6; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .filter-title { font-weight: bold; margin-bottom: 10px; font-size: 0.95rem; color: var(--primary); }
-        .filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
-        .filter-item { display: flex; align-items: center; font-size: 0.9rem; cursor: pointer; }
-        .filter-item input { margin-right: 6px; cursor: pointer; }
+        .setup-section { background: #f1f2f6; padding: 20px; border-radius: 8px; margin-bottom: 10px; text-align: center; }
+        .setup-title { font-weight: bold; margin-bottom: 15px; font-size: 1.1rem; color: var(--primary); }
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-bottom: 20px; text-align: left; }
+        .filter-item { display: flex; align-items: center; font-size: 1rem; cursor: pointer; }
+        .filter-item input { margin-right: 8px; transform: scale(1.1); cursor: pointer; }
         
         .progress { font-size: 0.9rem; color: #7f8c8d; text-align: right; margin-bottom: 10px; }
         .tag { display: inline-block; background: #eef2f7; color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 15px; }
-        .question { font-size: 1.25rem; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
-        .options { list-style: none; padding: 0; margin-bottom: 20px; }
+        .question { font-size: 1.25rem; font-weight: 600; margin-bottom: 20px; line-height: 1.5; text-align: left; }
+        .options { list-style: none; padding: 0; margin-bottom: 20px; text-align: left; }
         .item { background: var(--bg); border: 2px solid #e2e8f0; padding: 12px 18px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
         .item:hover { border-color: var(--primary); background: #fbf7fc; }
         .item.correct { background: #d4edda; border-color: var(--success); color: #155724; }
         .item.incorrect { background: #f8d7da; border-color: var(--danger); color: #721c24; }
         .item.disabled { pointer-events: none; }
-        .btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: background 0.2s; }
         .btn:hover { background: var(--hover); }
-        .btn-hint { background: none; border: 1px solid #cbd5e1; color: #475569; padding: 6px 14px; border-radius: 6px; cursor: pointer; }
-        .box { display: none; background: var(--hint); padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid var(--primary); }
-        .fb { margin-top: 15px; padding: 12px; border-radius: 8px; font-weight: 500; display: none; }
+        .btn-hint { background: none; border: 1px solid #cbd5e1; color: #475569; padding: 6px 14px; border-radius: 6px; cursor: pointer; display: inline-block; margin-bottom: 10px; }
+        
+        .box { display: none; background: var(--hint); padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid var(--primary); text-align: left; }
+        .fb { margin-top: 15px; padding: 12px; border-radius: 8px; font-weight: 500; display: none; text-align: left; }
         .fb.correct { display: block; background: #d4edda; color: #155724; }
         .fb.incorrect { display: block; background: #f8d7da; color: #721c24; }
         .actions { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--bg); }
@@ -42,54 +43,63 @@
         .group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
         .card { background: #fff; border: 1px solid #e2e8f0; border-left: 5px solid var(--danger); text-align: left; padding: 12px; margin-bottom: 10px; border-radius: 6px; }
         .card.clear { border-left-color: var(--success); text-align: center; font-size: 1.1rem; background: #f4fbf7; }
+        #error-msg { color: var(--danger); font-weight: bold; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 <div class="quiz-container">
-    <!-- Checkbox Filter Menu at the Top -->
-    <div class="filter-section" id="filter-menu">
-        <div class="filter-title">शब्द-चयनम् (Select Words to Quiz):</div>
+    <h1>संस्कृत-व्याकरण-प्रश्नोत्तरी</h1>
+
+    <!-- Screen 1: Dashboard Configuration Selection Panel -->
+    <div class="setup-section" id="setup-screen">
+        <div class="setup-title">अभ्यासार्थं शब्दान् चिन्वन्तु (Choose Words to Practice):</div>
         <div class="filter-grid">
-            <label class="filter-item"><input type="checkbox" value="राम" checked onchange="applyFilters()"> रामः</label>
-            <label class="filter-item"><input type="checkbox" value="देव" checked onchange="applyFilters()"> देवः</label>
-            <label class="filter-item"><input type="checkbox" value="नदी" checked onchange="applyFilters()"> नदी</label>
-            <label class="filter-item"><input type="checkbox" value="लता" checked onchange="applyFilters()"> लता</label>
-            <label class="filter-item"><input type="checkbox" value="माला" checked onchange="applyFilters()"> माला</label>
-            <label class="filter-item"><input type="checkbox" value="वन" checked onchange="applyFilters()"> वनम्</label>
-            <label class="filter-item"><input type="checkbox" value="फल" checked onchange="applyFilters()"> फलम्</label>
-            <label class="filter-item"><input type="checkbox" value="तद्" checked onchange="applyFilters()"> तद् (सः/सा)</label>
-            <label class="filter-item"><input type="checkbox" value="एतद्" checked onchange="applyFilters()"> एतद् (एषः)</label>
-            <label class="filter-item"><input type="checkbox" value="किम्" checked onchange="applyFilters()"> किम् (कः/का)</label>
+            <label class="filter-item"><input type="checkbox" value="राम" checked> रामः</label>
+            <label class="filter-item"><input type="checkbox" value="देव" checked> देवः</label>
+            <label class="filter-item"><input type="checkbox" value="नदी" checked> नदी</label>
+            <label class="filter-item"><input type="checkbox" value="लता" checked> लता</label>
+            <label class="filter-item"><input type="checkbox" value="माला" checked> माला</label>
+            <label class="filter-item"><input type="checkbox" value="वन" checked> वनम्</label>
+            <label class="filter-item"><input type="checkbox" value="फल" checked> फलम्</label>
+            <label class="filter-item"><input type="checkbox" value="तद्" checked> तद् (सः/सा)</label>
+            <label class="filter-item"><input type="checkbox" value="एतद्" checked> एतद् (एषः)</label>
+            <label class="filter-item"><input type="checkbox" value="किम्" checked> किम् (कः/का)</label>
         </div>
+        <button class="btn" onclick="generateCustomQuiz()">प्रश्नोत्तरी आरभ्यताम् (Start Quiz)</button>
+        <div id="error-msg">कृपया न्यूनतिन्यूनं एकं विकल्पं चिन्वन्तु!</div>
     </div>
 
-    <div id="quiz-screen">
-        <h1 id="quiz-title">संस्कृत-व्याकरण-प्रश्नोत्तरी</h1>
+    <!-- Screen 2: Dynamic Question Runner Panel -->
+    <div class="screen" id="quiz-screen">
         <div class="progress" id="p-text">प्रश्न संख्या: 1 / 10</div>
         <div class="tag" id="t-text">विषयः</div>
-        <div class="question" id="q-text">प्रश्नाः लोड हुँदैछन्...</div>
+        <div class="question" id="q-text">प्रश्नः</div>
         <ul class="options" id="o-box"></ul>
-        <button class="btn-hint" onclick="toggleHint()">सङ्केतः (Hint)</button>
+        <div style="text-align: left;"><button class="btn-hint" onclick="toggleHint()">सङ्केतः (Hint)</button></div>
         <div class="box" id="h-box"></div>
         <div class="fb" id="f-box"></div>
         <div class="actions"><div></div><button class="btn" id="n-btn" style="display:none;" onclick="nextQ()">अग्रिमप्रश्नः</button></div>
     </div>
+    <!-- Screen 3: Final Scoreboard Panel -->
     <div class="screen" id="res-screen">
-        <h1>प्रश्नोत्तरी समाप्ता</h1>
+        <h2>प्रश्नोत्तरी समाप्ता</h2>
         <p>भवतः/भवत्याः अङ्काः (Your Score):</p>
         <div class="score" id="s-text">0 / 10</div>
         <p id="eval-text">उत्तमं प्रयासम्!</p>
         <div class="group">
             <button class="btn" onclick="showReview()">त्रुटीन् पश्यन्तु (Revise Mistakes)</button>
-            <button class="btn" onclick="startRound()">नूतन-पर्यायः आरभ्यताम् (One More Round)</button>
+            <button class="btn" onclick="backToSetup()">नूतन-नियमैः सह पुनः खेलतु (New Selection)</button>
         </div>
     </div>
+
+    <!-- Screen 4: Revision Panel -->
     <div class="screen" id="rev-screen">
-        <h1>त्रुटि-संशोधनम् (Revision)</h1>
+        <h2>त्रुटि-संशोधनम् (Revision)</h2>
         <div id="rev-list"></div>
         <div class="group"><button class="btn" onclick="hideReview()">परिणाम-फलकम् प्रति गच्छतु</button></div>
     </div>
 </div>
+
 <script src="quiz-nouns.js"></script>
 <script src="quiz-pronouns.js"></script>
 <script>
@@ -104,43 +114,35 @@
                 masterQuestions = masterQuestions.concat(items);
             }
         });
-        if (masterQuestions.length > 0) {
-            applyFilters();
-        } else {
-            document.getElementById('q-text').innerText = "त्रुटिः: डेटा-सञ्चिका न मिलिता।";
+        if (masterQuestions.length === 0) {
+            document.getElementById('setup-screen').innerHTML = "<div style='color:var(--danger); font-weight:bold;'>त्रुटिः: डेटा-सञ्चिका न मिलिता। कृपया सञ्चिकाः पश्यन्तु।</div>";
         }
     }
 
-    // Dynamic filtration filter engine mapping topics to checkbox keys
-    function applyFilters() {
+    // Activated only when clicking the 'Start Quiz' button
+    function generateCustomQuiz() {
         const checkboxes = document.querySelectorAll('.filter-grid input[type="checkbox"]');
         let selectedValues = [];
         checkboxes.forEach(cb => { if (cb.checked) selectedValues.push(cb.value); });
 
+        if (selectedValues.length === 0) {
+            document.getElementById('error-msg').style.display = 'block';
+            return;
+        }
+        document.getElementById('error-msg').style.display = 'none';
+
+        // Filter the question deck securely based on selections
         filteredQuestions = masterQuestions.filter(q => {
             const topicText = q.topic || q.t || "";
             return selectedValues.some(val => topicText.includes(val));
         });
 
-        startRound();
-    }
-
-    function startRound() {
-        document.getElementById('res-screen').style.display = 'none';
-        document.getElementById('quiz-screen').style.display = 'block';
-        document.getElementById('filter-menu').style.display = 'block'; // Ensure selection menu is visible
-        
-        if (filteredQuestions.length === 0) {
-            document.getElementById('p-text').innerText = "प्रश्न संख्या: 0 / 0";
-            document.getElementById('t-text').innerText = "रिक्तम्";
-            document.getElementById('q-text').innerText = "कृपया कमपि एकं शब्दं चिन्वन्तु! (Please check at least one word selection above!)";
-            document.getElementById('o-box').innerHTML = '';
-            document.getElementById('n-btn').style.display = 'none';
-            return;
-        }
-
+        // Pull exactly 10 questions at random from the filtered pool
         active = [...filteredQuestions].sort(() => 0.5 - Math.random()).slice(0, Math.min(10, filteredQuestions.length));
         idx = 0; score = 0; mistakes = [];
+        
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
         loadQ();
     }
 
@@ -184,7 +186,6 @@
     function nextQ() { idx++; if (idx < active.length) loadQ(); else showResults(); }
     function showResults() {
         document.getElementById('quiz-screen').style.display = 'none'; document.getElementById('res-screen').style.display = 'block';
-        document.getElementById('filter-menu').style.display = 'none'; // Hide filters on completion screen
         document.getElementById('s-text').innerText = `${score} / ${active.length}`;
         const pct = (score / active.length) * 100;
         document.getElementById('eval-text').innerText = pct === 100 ? "अतिउत्तमम्! सर्वं शुद्धम्!" : pct >= 70 ? "उत्तमं प्रयासम्!" : "पुनः अभ्यासं करोतु।";
@@ -202,6 +203,7 @@
         document.getElementById('rev-screen').style.display = 'block';
     }
     function hideReview() { document.getElementById('rev-screen').style.display = 'none'; document.getElementById('res-screen').style.display = 'block'; }
+    function backToSetup() { document.getElementById('res-screen').style.display = 'none'; document.getElementById('setup-screen').style.display = 'block'; }
     window.addEventListener('DOMContentLoaded', initQuiz);
 </script>
 </body>
