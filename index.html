@@ -69,7 +69,7 @@
     </div>
 </div>
 
-<!-- Local source injection linking directly to your pre-existing data arrays -->
+<!-- Linking your separate local script data streams -->
 <script src="quiz-nouns.js"></script>
 <script src="quiz-pronouns.js"></script>
 
@@ -77,17 +77,16 @@
     let masterQuestions = [], active = [], idx = 0, score = 0, mistakes = [];
 
     function initQuiz() {
-        let nounsExist = (typeof nounQuestions !== 'undefined');
-        let pronounsExist = (typeof pronounQuestions !== 'undefined');
+        // Checking for nounQuestions array or fallback to a standard global db array
+        let nouns = typeof nounQuestions !== 'undefined' ? nounQuestions : (typeof db !== 'undefined' ? db : []);
+        let pronouns = typeof pronounQuestions !== 'undefined' ? pronounQuestions : [];
 
-        if (nounsExist || pronounsExist) {
-            masterQuestions = [];
-            // Merge both files seamlessly into one collection
-            if (nounsExist) masterQuestions = masterQuestions.concat(nounQuestions);
-            if (pronounsExist) masterQuestions = masterQuestions.concat(pronounQuestions);
+        masterQuestions = [...nouns, ...pronouns];
+
+        if (masterQuestions.length > 0) {
             startRound();
         } else {
-            document.getElementById('q-text').innerText = "त्रुटिः: डेटा-सञ्चिका न मिलिता। (Error: Make sure your variable names match)";
+            document.getElementById('q-text').innerText = "त्रुटिः: डेटा-सञ्चिका न मिलिता। कृपया सञ्चिकानामानि पश्यन्तु।";
         }
     }
 
@@ -102,7 +101,6 @@
     function loadQ() {
         const q = active[idx];
         document.getElementById('p-text').innerText = `प्रश्न संख्या: ${idx + 1} / 10`;
-        // Accommodate variations in object formatting ('topic' vs 't', 'questionText' vs 'q')
         document.getElementById('t-text').innerText = q.topic || q.t;
         document.getElementById('q-text').innerText = q.questionText || q.q;
         document.getElementById('h-box').style.display = 'none';
@@ -164,14 +162,14 @@
 
     function nextQ() {
         idx++;
-        if (idx < 10) loadQ(); else showResults();
+        if (idx < 10 && idx < active.length) loadQ(); else showResults();
     }
 
     function showResults() {
         document.getElementById('quiz-screen').style.display = 'none';
         document.getElementById('res-screen').style.display = 'block';
-        document.getElementById('s-text').innerText = `${score} / 10`;
-        const pct = (score / 10) * 100;
+        document.getElementById('s-text').innerText = `${score} / ${active.length}`;
+        const pct = (score / active.length) * 100;
         document.getElementById('eval-text').innerText = pct === 100 ? "अतिउत्तमम्! सर्वं शुद्धम्!" : pct >= 70 ? "उत्तमं प्रयासम्!" : "पुनः अभ्यासं करोतु।";
     }
 
@@ -191,8 +189,8 @@
             });
         }
         document.getElementById('rev-screen').style.display = 'block';
-        }
-    
+    }
+
     function hideReview() {
         document.getElementById('rev-screen').style.display = 'none';
         document.getElementById('res-screen').style.display = 'block';
