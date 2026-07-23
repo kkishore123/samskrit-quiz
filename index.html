@@ -126,6 +126,7 @@
     }
 
     // Absolute Exact Match Filter Engine to guarantee zero leakage overlaps
+        // Enhanced filtration and true-randomization shuffling engine
     function generateCustomQuiz() {
         const checkboxes = document.querySelectorAll('.filter-grid input[type="checkbox"]');
         let selectedTags = [];
@@ -137,11 +138,28 @@
         }
         document.getElementById('error-msg').style.display = 'none';
 
-        // Filter the question deck checking for exact match equivalence (===)
+        // 1. Gather all questions matching the checked terms
         filteredQuestions = masterQuestions.filter(q => {
             const topicText = q.topic || q.t || "";
             return selectedTags.some(tag => topicText === tag);
         });
+
+        // 2. Perform a True Fisher-Yates shuffle across the ENTIRE filtered pool
+        // This mixes all 300+ questions up completely before we take the top 10
+        for (let i = filteredQuestions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [filteredQuestions[i], filteredQuestions[j]] = [filteredQuestions[j], filteredQuestions[i]];
+        }
+
+        // 3. Slice out exactly 10 questions from the completely scrambled deck
+        active = filteredQuestions.slice(0, Math.min(10, filteredQuestions.length));
+        idx = 0; score = 0; mistakes = [];
+        
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
+        loadQ();
+    }
+
 
         // Pull exactly 10 questions at random from the tightly filtered pool
         active = [...filteredQuestions].sort(() => 0.5 - Math.random()).slice(0, Math.min(10, filteredQuestions.length));
