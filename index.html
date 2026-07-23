@@ -54,16 +54,22 @@
     <div class="setup-section" id="setup-screen">
         <div class="setup-title">अभ्यासार्थं शब्दान् चिन्वन्तु (Choose Words to Practice):</div>
         <div class="filter-grid">
-            <label class="filter-item"><input type="checkbox" value="रामशब्दः" checked> रामः</label>
-            <label class="filter-item"><input type="checkbox" value="देवशब्दः" checked> देवः</label>
-            <label class="filter-item"><input type="checkbox" value="नदीशब्दः" checked> नदी</label>
-            <label class="filter-item"><input type="checkbox" value="लताशब्दः" checked> लता</label>
-            <label class="filter-item"><input type="checkbox" value="मालाशब्दः" checked> माला</label>
-            <label class="filter-item"><input type="checkbox" value="वनशब्दः" checked> वनम्</label>
-            <label class="filter-item"><input type="checkbox" value="फलशब्दः" checked> फलम्</label>
-            <label class="filter-item"><input type="checkbox" value="तच्छब्दः" checked> तद् (सः/सा)</label>
-            <label class="filter-item"><input type="checkbox" value="एतच्छब्दः" checked> एतद् (एषः)</label>
-            <label class="filter-item"><input type="checkbox" value="किम्शब्दः" checked> किम् (कः/का)</label>
+            <label class="filter-item"><input type="checkbox" value="अकारान्तपुंलिङ्ग-रामशब्दः" checked> रामः</label>
+            <label class="filter-item"><input type="checkbox" value="अकारान्तपुंलिङ्ग-देवशब्दः" checked> देवः</label>
+            <label class="filter-item"><input type="checkbox" value="ईकारान्तस्त्रीलिङ्ग-नदीशब्दः" checked> नदी</label>
+            <label class="filter-item"><input type="checkbox" value="आकारान्तस्त्रीलिङ्ग-लताशब्दः" checked> लता</label>
+            <label class="filter-item"><input type="checkbox" value="आकारान्तस्त्रीलिङ्ग-मालाशब्दः" checked> माला</label>
+            <label class="filter-item"><input type="checkbox" value="अकारान्तनपुंसकलिङ्ग-वनशब्दः" checked> वनम्</label>
+            <label class="filter-item"><input type="checkbox" value="अकारान्तनपुंसकलिङ्ग-फलशब्दः" checked> फलम्</label>
+            <label class="filter-item"><input type="checkbox" value="सर्वनाम-तच्छब्दः (पुंलिङ्गः - सः)" checked> तद् (पुंलिङ्गः)</label>
+            <label class="filter-item"><input type="checkbox" value="सर्वनाम-तच्छब्दः (स्त्रीलिङ्गः - सा)" checked> तद् (स्त्रीलिङ्गः)</label>
+            <label class="filter-item"><input type="checkbox" value="सर्वनाम-तच्छब्दः (नपुंसकलिङ्गः - तद्)" checked> तद् (नपुंसकलिङ्गः)</label>
+            <label class="filter-item"><input type="checkbox" value="सर्वनाम-एतच्छब्दः (पुंलिङ्गः - एषः)" checked> एतद् (पुंलिङ्गः)</label>
+            <label class="filter-item"><input type="checkbox" value="सर्वनाम-एतच्छब्दः (स्त्रीलिङ्गः - एषा)" checked> एतद् (स्त्रीलिङ्गः)</label>
+            <label class="filter-item"><input type="checkbox" value="सर्वनाम-एतच्छब्दः (नपुंसकलिङ्गः - एतत्)" checked> एतद् (नपुंसकलिङ्गः)</label>
+            <label class="filter-item"><input type="checkbox" value="प्रश्नवाचकसर्वनाम-किम्शब्दः (पुंलिङ्गः - कः)" checked> किम् (पुंलिङ्गः)</label>
+            <label class="filter-item"><input type="checkbox" value="प्रश्नवाचकसर्वनाम-किम्शब्दः (स्त्रीलिङ्गः - का)" checked> किम् (स्त्रीलिङ्गः)</label>
+            <label class="filter-item"><input type="checkbox" value="प्रश्नवाचकसर्वनाम-किम्शब्दः (नपुंसकलिङ्गः - किम्)" checked> किम् (नपुंसकलिङ्गः)</label>
         </div>
         <button class="btn" onclick="generateCustomQuiz()">प्रश्नोत्तरी आरभ्यताम् (Start Quiz)</button>
         <div id="error-msg">कृपया न्यूनतिन्यूनं एकं विकल्पं चिन्वन्तु!</div>
@@ -115,11 +121,11 @@
             }
         });
         if (masterQuestions.length === 0) {
-            document.getElementById('setup-screen').innerHTML = "<div style='color:var(--danger); font-weight:bold;'>त्रुटिः: डेटा-सञ्चिका न मिलिता।</div>";
+            document.getElementById('setup-screen').innerHTML = "<div style='color:var(--danger); font-weight:bold;'>त्रुटिः: डेटा-सञ्चिका न मिलिता। कृपया सञ्चिकाः पश्यन्तु।</div>";
         }
     }
 
-    // Exact Tag Filter Engine to completely block textual overlaps
+    // Absolute Exact Match Filter Engine to guarantee zero leakage overlaps
     function generateCustomQuiz() {
         const checkboxes = document.querySelectorAll('.filter-grid input[type="checkbox"]');
         let selectedTags = [];
@@ -131,12 +137,13 @@
         }
         document.getElementById('error-msg').style.display = 'none';
 
-        // Filter executing an absolute, unambiguous keyword search
+        // Filter the question deck checking for exact match equivalence (===)
         filteredQuestions = masterQuestions.filter(q => {
             const topicText = q.topic || q.t || "";
-            return selectedTags.some(tag => topicText.includes(val = tag));
+            return selectedTags.some(tag => topicText === tag);
         });
 
+        // Pull exactly 10 questions at random from the tightly filtered pool
         active = [...filteredQuestions].sort(() => 0.5 - Math.random()).slice(0, Math.min(10, filteredQuestions.length));
         idx = 0; score = 0; mistakes = [];
         
